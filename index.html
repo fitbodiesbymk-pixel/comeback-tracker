@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Comeback Strong | Fitbodies by MK</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *{box-sizing:border-box;}
+    body{font-family:'Inter',sans-serif;background:linear-gradient(160deg,#0D1B2E 0%,#1a3a5c 100%);min-height:100vh;color:#1C1C1C;}
+    h1,h2,h3,h4{font-family:'Oswald',sans-serif;}
+    input[type=number]{-moz-appearance:textfield;}
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;}
+    .fade-in{animation:fi .18s ease;}
+    @keyframes fi{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+    .nav-active{color:#2B8FD0;border-bottom:2px solid #2B8FD0;}
+    .nav-off{color:#9CA3AF;border-bottom:2px solid transparent;}
+    .pill{display:inline-block;background:#DBEAFE;color:#1D4ED8;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;}
+    .pill-green{background:#DCFCE7;color:#166534;}
+    .pill-orange{background:#FEF3C7;color:#92400E;}
+    .card{background:#fff;border-radius:20px;padding:20px;margin-bottom:14px;border:1px solid #E5E7EB;box-shadow:0 2px 8px rgba(0,0,0,.06);}
+    .card:hover{border-color:#2B8FD0;}
+    .page{max-width:480px;margin:0 auto;padding:28px 16px 0;}
+    .section-header{background:linear-gradient(135deg,#0D1B2E,#1e3a5f);border-radius:20px 20px 0 0;padding:28px 20px 20px;margin-bottom:0;}
+    .back-btn{display:flex;align-items:center;gap:6px;color:rgba(255,255,255,.6);font-size:13px;background:none;border:none;cursor:pointer;margin-bottom:16px;font-family:Inter,sans-serif;padding:0;}
+    .back-btn:hover{color:#fff;}
+    input,select,textarea{font-family:'Inter',sans-serif;}
+  </style>
+</head>
+<body class="pb-24">
+
+<!-- ============================================================
+  WORKOUT CONFIG
+  To add a new program: copy the object in PROGRAMS and fill it in.
+  Each exercise can have a `video` YouTube URL.
+============================================================ -->
+<script>
+const PROGRAMS = [
+  {
+    id:'comeback-strong',
+    name:'Comeback Strong',
+    subtitle:'6 Week Strength & Reset',
+    schedule:'Weeks 1–3: Alternate W1 & W2  ·  Weeks 4–6: Alternate W3 & W4',
+    phaseUnlock: 6,
+    phaseTarget: 9,
+    workouts:[
+      {
+        id:'w1',name:'Workout 1',phase:'Phase 1',
+        groups:[
+          {name:'Warm-Up',type:'warmup',exercises:[
+            {name:'Spiderman Stretch',           sets:1,reps:'5 each side',         video:'https://youtu.be/JDEF9Sdx02Q'},
+            {name:'Kneeling Hamstring Stretch',  sets:1,reps:'3 breaths each side', video:'https://youtu.be/lNBBct7CKoI'},
+            {name:'90/90 Hip External Rotation', sets:1,reps:'3 breaths each side', video:'https://youtu.be/h9xcS5_TyjA'},
+            {name:'90/90 Hip Internal Rotation', sets:1,reps:'3 breaths each side', video:'https://youtu.be/kyrnZpnF06Q'},
+            {name:'Lateral Squat',               sets:1,reps:'3 breaths each side', video:'https://youtu.be/qL3rEiCk0Z0'},
+            {name:'Floor Slides',                sets:1,reps:'5 reps',              video:'https://youtu.be/v7ihBB6bIJk'},
+          ]},
+          {name:'Bi-Plex 1',type:'working',exercises:[
+            {name:'Incline Dumbbell Press',             sets:3,reps:'10–12',          video:'https://youtu.be/B-FoS212ZbQ'},
+            {name:'Front-Loaded Dumbbell Split Squats', sets:3,reps:'10–12 each leg', video:'https://youtu.be/Wq2rLkyFA3E'},
+          ]},
+          {name:'Bi-Plex 2',type:'working',exercises:[
+            {name:'Chest Supported Dumbbell Rows', sets:3,reps:'10–12', video:'https://youtu.be/0alpJ6tSaG4'},
+            {name:'Glute Bridge / Hip Raises',     sets:3,reps:'10–12', video:'https://youtu.be/hBf7caa--Ng'},
+          ]},
+          {name:'Tri-Plex 3',type:'working',exercises:[
+            {name:'Straight Arm Pull-downs',                 sets:3,reps:'12–15', video:'https://youtu.be/rm7blcLh60w'},
+            {name:'Chest Supported Dumbbell Lateral Raises', sets:3,reps:'12–15', video:'https://youtu.be/MWziO_GDZlc'},
+            {name:'Abdominal Crunch on Floor',               sets:3,reps:'12–15', video:'https://youtu.be/eFChCJ61SQA'},
+          ]},
+          {name:'Finisher',type:'finisher',exercises:[
+            {name:'Mountain Climbers',sets:5,reps:'20 seconds',video:'https://youtu.be/CZTW0q2p96A'},
+          ]},
+        ]
+      },
+      {
+        id:'w2',name:'Workout 2',phase:'Phase 1',
+        groups:[
+          {name:'Warm-Up',type:'warmup',exercises:[
+            {name:'Spiderman Stretch',           sets:1,reps:'5 breaths each side', video:'https://youtu.be/JDEF9Sdx02Q'},
+            {name:'Kneeling Hamstring Stretch',  sets:1,reps:'3 breaths each side', video:'https://youtu.be/lNBBct7CKoI'},
+            {name:'90/90 Hip External Rotation', sets:1,reps:'3 breaths each side', video:'https://youtu.be/h9xcS5_TyjA'},
+            {name:'90/90 Hip Internal Rotation', sets:1,reps:'3 breaths each side', video:'https://youtu.be/kyrnZpnF06Q'},
+            {name:'Lateral Squat',               sets:1,reps:'5 each side',         video:'https://youtu.be/qL3rEiCk0Z0'},
+            {name:'Floor Slides',                sets:1,reps:'5 reps',              video:'https://youtu.be/v7ihBB6bIJk'},
+          ]},
+          {name:'Bi-Plex 1',type:'working',exercises:[
+            {name:'Flat Dumbbell Press',         sets:3,reps:'10–12', video:'https://youtube.com/shorts/0d6uhnD6xnw'},
+            {name:'Front Loaded Dumbbell Squat', sets:3,reps:'10–12', video:'https://youtube.com/shorts/wgz5KNPg_5g'},
+          ]},
+          {name:'Bi-Plex 2',type:'working',exercises:[
+            {name:'Single Arm Dumbbell Rows',            sets:3,reps:'10–12 each side', video:'https://youtube.com/shorts/kJp-xejA35E'},
+            {name:'Upper Back Supported Hip Thrust/Lift',sets:3,reps:'10–12',           video:'https://youtube.com/shorts/qEYOm8GFsvU'},
+          ]},
+          {name:'Tri-Plex 3',type:'working',exercises:[
+            {name:'High Position Push-Up with Band',     sets:3,reps:'10–12', video:'https://youtu.be/_OuDmqxiTeY'},
+            {name:'Incline Dumbbell Curls',              sets:3,reps:'10–12', video:'https://youtu.be/X3boAGSt48I'},
+            {name:'Standing Chest Supported Pull Apart', sets:3,reps:'10–12', video:'https://youtu.be/Fgm2a7ydBig'},
+          ]},
+          {name:'Finisher',type:'finisher',exercises:[
+            {name:'High Knee Sprint On The Spot',sets:5,reps:'20 seconds',video:'https://youtu.be/VI9u2CZrMqI'},
+          ]},
+        ]
+      },
+      {
+        id:'w3',name:'Workout 3',phase:'Phase 2',
+        groups:[
+          {name:'Warm-Up',type:'warmup',exercises:[
+            {name:'Spiderman Stretch',           sets:1,reps:'5 each side',         video:'https://youtu.be/JDEF9Sdx02Q'},
+            {name:'Kneeling Hamstring Stretch',  sets:1,reps:'3 breaths each side', video:'https://youtu.be/lNBBct7CKoI'},
+            {name:'90/90 Hip External Rotation', sets:1,reps:'3 breaths each side', video:'https://youtu.be/h9xcS5_TyjA'},
+            {name:'90/90 Hip Internal Rotation', sets:1,reps:'3 breaths each side', video:'https://youtu.be/kyrnZpnF06Q'},
+            {name:'Lateral Squat',               sets:1,reps:'3 breaths each side', video:'https://youtu.be/qL3rEiCk0Z0'},
+            {name:'Floor Slides',                sets:1,reps:'5 reps',              video:'https://youtu.be/v7ihBB6bIJk'},
+          ]},
+          {name:'Bi-Plex 1',type:'working',exercises:[
+            {name:'Incline Dumbbell Press',        sets:3,reps:'8–10', video:'https://youtu.be/B-FoS212ZbQ'},
+            {name:'Dumbbell Straight Leg Deadlift',sets:3,reps:'8–10', video:'https://youtube.com/shorts/Ksj9q2tA2Lc'},
+          ]},
+          {name:'Bi-Plex 2',type:'working',exercises:[
+            {name:'Flat Dumbbell Press',  sets:3,reps:'10–12',          video:'https://youtu.be/0d6uhnD6xnw'},
+            {name:'Single Leg Hip Bridge',sets:3,reps:'10–12 each leg', video:'https://youtu.be/N8WA9LiynA4'},
+          ]},
+          {name:'Bi-Plex 3',type:'working',exercises:[
+            {name:'Chest Supported Dumbbell Rows',sets:3,reps:'12–15', video:'https://youtu.be/0alpJ6tSaG4'},
+            {name:'Reverse Crunch on Bench',      sets:3,reps:'10–12', video:'https://youtu.be/kbKUP9IjG88'},
+          ]},
+          {name:'Bi-Plex 4',type:'working',exercises:[
+            {name:'Seated Incline Dumbbell Curls',sets:2,reps:'10–12', video:'https://youtu.be/X3boAGSt48I'},
+            {name:'Narrow Stance Push-Up',        sets:2,reps:'10–12', video:'https://youtu.be/3eHly8IeiPo'},
+          ]},
+          {name:'Finisher',type:'finisher',exercises:[
+            {name:'Mountain Climbers',sets:5,reps:'30 seconds',video:'https://youtu.be/CZTW0q2p96A'},
+          ]},
+        ]
+      },
+      {
+        id:'w4',name:'Workout 4',phase:'Phase 2',
+        groups:[
+          {name:'Warm-Up',type:'warmup',exercises:[
+            {name:'Spiderman Stretch',           sets:1,reps:'5 breaths each side', video:'https://youtu.be/JDEF9Sdx02Q'},
+            {name:'Kneeling Hamstring Stretch',  sets:1,reps:'3 breaths each side', video:'https://youtu.be/lNBBct7CKoI'},
+            {name:'90/90 Hip External Rotation', sets:1,reps:'3 breaths each side', video:'https://youtu.be/h9xcS5_TyjA'},
+            {name:'90/90 Hip Internal Rotation', sets:1,reps:'3 breaths each side', video:'https://youtu.be/kyrnZpnF06Q'},
+            {name:'Lateral Squat',               sets:1,reps:'5 each side',         video:'https://youtu.be/qL3rEiCk0Z0'},
+            {name:'Floor Slides',                sets:1,reps:'5 reps',              video:'https://youtu.be/v7ihBB6bIJk'},
+          ]},
+          {name:'Bi-Plex 1',type:'working',exercises:[
+            {name:'Single Arm Dumbbell Rows (Dead Stop)',sets:3,reps:'8–10 each side', video:'https://youtu.be/M1K4ukQ9xMs'},
+            {name:'Front Loaded Dumbbell Split Squats',  sets:3,reps:'8–10 each leg',  video:'https://youtu.be/Wq2rLkyFA3E'},
+          ]},
+          {name:'Bi-Plex 2',type:'working',exercises:[
+            {name:'Straight Arm Pull-Downs',    sets:3,reps:'10–12', video:'https://youtu.be/rm7blcLh60w'},
+            {name:'Front Loaded Dumbbell Squat',sets:3,reps:'10–12', video:'https://youtu.be/wgz5KNPg_5g'},
+          ]},
+          {name:'Bi-Plex 3',type:'working',exercises:[
+            {name:'Seated Dumbbell Side Raises',sets:3,reps:'10–12',    video:'https://youtu.be/2cfOoB7y6R8'},
+            {name:'Front Planks',               sets:3,reps:'30 seconds',video:'https://youtu.be/Dw2KDvubj_Q'},
+          ]},
+          {name:'Bi-Plex 4',type:'working',exercises:[
+            {name:'Standing Neutral Grip Bicep Curls', sets:2,reps:'10–12', video:'https://youtu.be/0MFUw_az4gg'},
+            {name:'Lying Dumbbell Triceps Extensions', sets:2,reps:'10–12', video:'https://youtu.be/unaBOLBT4F0'},
+          ]},
+          {name:'Finisher',type:'finisher',exercises:[
+            {name:'High Knee Sprint On The Spot',sets:5,reps:'30 seconds',video:'https://youtu.be/VI9u2CZrMqI'},
+          ]},
+        ]
+      },
+    ]
+  },
+  // ← ADD NEW PROGRAMS HERE
+];
+</script>
+
+
+<div id="app"></div>
+
+<!-- BOTTOM NAV -->
+<nav style="position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #E5E7EB;z-index:50;box-shadow:0 -2px 12px rgba(0,0,0,.08);">
+  <div style="display:flex;justify-content:space-around;max-width:480px;margin:0 auto;">
+    <button id="nav-programs" class="nav-active" onclick="showView('programs')"
+      style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 24px;font-size:11px;font-weight:700;background:none;border:none;cursor:pointer;font-family:Inter,sans-serif;flex:1;">
+      <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+      Programs
+    </button>
+    <button id="nav-progress" class="nav-off" onclick="showView('progress')"
+      style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 24px;font-size:11px;font-weight:700;background:none;border:none;cursor:pointer;font-family:Inter,sans-serif;flex:1;">
+      <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+      Progress
+    </button>
+    <button id="nav-history" class="nav-off" onclick="showView('history')"
+      style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 24px;font-size:11px;font-weight:700;background:none;border:none;cursor:pointer;font-family:Inter,sans-serif;flex:1;">
+      <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      History
+    </button>
+  </div>
+</nav>
+
+<script>
+// ── STATE ──────────────────────────────────────────────────────
+var appState = {
+  view: 'programs',
+  program: null,
+  workout: null,
+  sessionId: null,
+  progressExercise: null,
+};
+
+// ── STORAGE ────────────────────────────────────────────────────
+function getSessions() {
+  try { return JSON.parse(localStorage.getItem('cb_sessions') || '[]'); }
+  catch(e) { return []; }
+}
+function saveSession(s) {
+  var all = getSessions();
+  all.unshift(s);
+  localStorage.setItem('cb_sessions', JSON.stringify(all));
+}
+
+// ── VIDEO ──────────────────────────────────────────────────────
+function openVideo(name, url) {
+  window.open(url, '_blank');
+}
+
+// ── NAVIGATION ─────────────────────────────────────────────────
+function showView(v) {
+  appState.view = v;
+  ['programs','progress','history'].forEach(function(id) {
+    var el = document.getElementById('nav-' + id);
+    if (!el) return;
+    el.className = (id === v) ? 'nav-active' : 'nav-off';
+  });
+  render();
+}
+
+// ── RENDER ─────────────────────────────────────────────────────
+function render() {
+  var app = document.getElementById('app');
+  var html = '';
+  if (appState.view === 'programs')  html = viewPrograms();
+  else if (appState.view === 'workouts') html = viewWorkouts();
+  else if (appState.view === 'active')   html = viewActive();
+  else if (appState.view === 'history')  html = viewHistory();
+  else if (appState.view === 'detail')   html = viewDetail();
+  else if (appState.view === 'progress') html = viewProgress();
+  app.innerHTML = html;
+  app.className = 'fade-in';
+  if (appState.view === 'progress') setTimeout(drawChart, 80);
+}
+
+// ── PROGRAMS ───────────────────────────────────────────────────
+function viewPrograms() {
+  var cards = PROGRAMS.map(function(p) {
+    var badges = p.workouts.map(function(w,i) {
+      var cls = i < 2 ? 'pill-green' : 'pill-orange';
+      return '<span class="pill ' + cls + '">' + w.name + '</span>';
+    }).join('');
+    return '<div onclick="selectProgram(\'' + p.id + '\')" class="card" style="cursor:pointer;border-left:4px solid #2B8FD0;">'
+      + '<div style="display:flex;justify-content:space-between;align-items:flex-start;">'
+      + '<div style="flex:1;">'
+      + '<h2 style="font-family:Oswald,sans-serif;font-size:22px;font-weight:700;color:#0D1B2E;margin-bottom:3px;">' + p.name + '</h2>'
+      + '<p style="color:#2B8FD0;font-size:13px;font-weight:600;margin-bottom:6px;">' + p.subtitle + '</p>'
+      + '<p style="color:#6B7280;font-size:11px;">' + p.schedule + '</p>'
+      + '</div>'
+      + '<svg width="20" height="20" fill="none" stroke="#CBD5E1" viewBox="0 0 24 24" style="flex-shrink:0;margin-top:2px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>'
+      + '</div>'
+      + '<div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:6px;">' + badges + '</div>'
+      + '</div>';
+  }).join('');
+
+  var howToItems = [
+    ['Select a program', 'Tap a program card below to see its workouts.'],
+    ['Start a session', 'Tap a workout to open it, then log your weight and reps for each working set.'],
+    ['Watch demo videos', 'Tap any exercise name (▶) to open the demo video in YouTube.'],
+    ['Save your session', 'Fill in your session notes at the bottom and tap <strong>Complete Workout</strong> to save.'],
+    ['Track progress', 'Use the <strong>Progress</strong> tab to see your best weight over time for any exercise.'],
+    ['Review history', 'The <strong>History</strong> tab shows every session you\'ve logged.'],
+    ['Phase unlock', 'Phase 2 unlocks automatically once you\'ve completed enough Phase 1 sessions — no skipping ahead.'],
+  ];
+  var howToRows = howToItems.map(function(item) {
+    return '<div style="display:flex;gap:12px;margin-bottom:12px;">'
+      + '<div style="width:6px;height:6px;border-radius:50%;background:#2B8FD0;flex-shrink:0;margin-top:5px;"></div>'
+      + '<div><p style="font-size:13px;font-weight:600;color:#0D1B2E;margin-bottom:1px;">' + item[0] + '</p>'
+      + '<p style="font-size:12px;color:#6B7280;">' + item[1] + '</p></div>'
+      + '</div>';
+  }).join('');
+
+  var planNoteItems = [
+    ['Videos', 'Each movement includes a video demonstration. Tap the exercise name to view it. Watch all videos before your first session, then refer back as needed.'],
+    ['Reps', 'One full movement of an exercise. One push-up = one rep.'],
+    ['Sets', 'A group of reps done consecutively before resting. 3 sets of 10 means: do 10 reps, rest, repeat twice more.'],
+    ['Bi-Plex / Tri-Plex', 'Perform the listed exercises back-to-back without rest, then take the prescribed rest before repeating.'],
+    ['Choosing weights', 'Use a weight that challenges you in the given rep range. Can\'t reach the lower number? Go lighter. Can exceed the top easily? Go heavier.'],
+    ['Session notes', 'After each workout, complete your notes. Honest feedback helps adjust the plan if needed.'],
+  ];
+  var planNoteRows = planNoteItems.map(function(item) {
+    return '<div style="display:flex;gap:12px;margin-bottom:12px;">'
+      + '<div style="width:6px;height:6px;border-radius:50%;background:#F59E0B;flex-shrink:0;margin-top:5px;"></div>'
+      + '<div><p style="font-size:13px;font-weight:600;color:#0D1B2E;margin-bottom:1px;">' + item[0] + '</p>'
+      + '<p style="font-size:12px;color:#6B7280;">' + item[1] + '</p></div>'
+      + '</div>';
+  }).join('');
+
+  var infoCards = '<div class="card" style="padding:0;overflow:hidden;margin-bottom:14px;">'
+    + '<button onclick="var b=document.getElementById(\'how-body\');var a=document.getElementById(\'how-arrow\');var open=b.style.display!==\'none\';b.style.display=open?\'none\':\'block\';a.style.transform=open?\'rotate(0deg)\':\'rotate(180deg)\';" style="width:100%;display:flex;justify-content:space-between;align-items:center;padding:16px 20px;background:none;border:none;cursor:pointer;font-family:Inter,sans-serif;">'
+    + '<div style="display:flex;align-items:center;gap:10px;">'
+    + '<svg width="18" height="18" fill="none" stroke="#2B8FD0" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>'
+    + '<span style="font-family:Oswald,sans-serif;font-size:16px;font-weight:600;color:#0D1B2E;">How to use this app</span>'
+    + '</div>'
+    + '<svg id="how-arrow" width="16" height="16" fill="none" stroke="#9CA3AF" viewBox="0 0 24 24" style="transition:transform .2s;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>'
+    + '</button>'
+    + '<div id="how-body" style="display:none;padding:4px 20px 20px;">'
+    + howToRows
+    + '</div></div>'
+
+    + '<div class="card" style="padding:0;overflow:hidden;margin-bottom:14px;">'
+    + '<button onclick="var b=document.getElementById(\'plan-body\');var a=document.getElementById(\'plan-arrow\');var open=b.style.display!==\'none\';b.style.display=open?\'none\':\'block\';a.style.transform=open?\'rotate(0deg)\':\'rotate(180deg)\';" style="width:100%;display:flex;justify-content:space-between;align-items:center;padding:16px 20px;background:none;border:none;cursor:pointer;font-family:Inter,sans-serif;">'
+    + '<div style="display:flex;align-items:center;gap:10px;">'
+    + '<svg width="18" height="18" fill="none" stroke="#F59E0B" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>'
+    + '<span style="font-family:Oswald,sans-serif;font-size:16px;font-weight:600;color:#0D1B2E;">Plan Notes</span>'
+    + '</div>'
+    + '<svg id="plan-arrow" width="16" height="16" fill="none" stroke="#9CA3AF" viewBox="0 0 24 24" style="transition:transform .2s;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>'
+    + '</button>'
+    + '<div id="plan-body" style="display:none;padding:4px 20px 20px;">'
+    + planNoteRows
+    + '</div></div>';
+
+  return '<div style="background:linear-gradient(160deg,#0D1B2E 0%,#1a3a5c 100%);min-height:100vh;padding-bottom:80px;">'
+    + '<div style="padding:40px 16px 24px;max-width:480px;margin:0 auto;">'
+    + '<p style="color:rgba(255,255,255,.5);font-family:Oswald,sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.12em;margin-bottom:4px;">Fitbodies by MK</p>'
+    + '<h1 style="font-family:Oswald,sans-serif;font-size:34px;font-weight:700;color:#fff;margin-bottom:4px;">Your Programs</h1>'
+    + '<p style="color:rgba(255,255,255,.4);font-size:13px;margin-bottom:24px;">Select a program to get started.</p>'
+    + '</div>'
+    + '<div style="background:#F0F4FF;border-radius:24px 24px 0 0;min-height:70vh;padding:24px 16px 0;max-width:480px;margin:0 auto;">'
+    + infoCards
+    + cards
+    + '<p style="text-align:center;color:#9CA3AF;font-size:11px;margin-top:16px;">Data saved on this device &nbsp;·&nbsp; <span style="color:#2B8FD0;cursor:pointer;" onclick="if(confirm(\'Clear all history?\')){localStorage.removeItem(\'cb_sessions\');render();}">Clear history</span></p>'
+    + '</div></div>';
+}
+
+function selectProgram(id) {
+  appState.program = PROGRAMS.find(function(p){ return p.id === id; });
+  appState.view = 'workouts';
+  render();
+}
+
+// ── WORKOUTS ───────────────────────────────────────────────────
+function viewWorkouts() {
+  var p = appState.program;
+  var sessions = getSessions();
+  var phase1Count = sessions.filter(function(s){ return s.program===p.name && s.phase==='Phase 1'; }).length;
+  var required = p.phaseUnlock || 6;
+  var target = p.phaseTarget || required;
+  var phase2Unlocked = phase1Count >= required;
+
+  var cards = p.workouts.map(function(w) {
+    var count = w.groups.filter(function(g){ return g.type==='working'; })
+      .reduce(function(a,g){ return a+g.exercises.length; }, 0);
+    var logged = sessions.filter(function(s){ return s.workout===w.name && s.program===p.name; }).length;
+    var isP2 = w.phase === 'Phase 2';
+    var pillCls = isP2 ? 'pill-orange' : 'pill-green';
+    var borderColor = isP2 ? '#F59E0B' : '#10B981';
+
+    if (isP2 && !phase2Unlocked) {
+      var pct = Math.min(100, Math.round((phase1Count / target) * 100));
+      var remaining = required - phase1Count;
+      return '<div class="card" style="opacity:.65;border-left:4px solid #D1D5DB;cursor:default;">'
+        + '<div style="display:flex;justify-content:space-between;align-items:flex-start;">'
+        + '<div style="flex:1;">'
+        + '<span class="pill" style="background:#F3F4F6;color:#9CA3AF;margin-bottom:6px;display:inline-block;">' + w.phase + '</span>'
+        + '<h3 style="font-family:Oswald,sans-serif;font-size:20px;font-weight:700;color:#6B7280;">' + w.name + '</h3>'
+        + '<p style="color:#9CA3AF;font-size:11px;margin-top:2px;">' + count + ' exercises</p>'
+        + '</div>'
+        + '<svg width="20" height="20" fill="none" stroke="#9CA3AF" viewBox="0 0 24 24" style="flex-shrink:0;margin-top:2px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>'
+        + '</div>'
+        + '<div style="margin-top:14px;">'
+        + '<div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:6px;">'
+        + '<span style="color:#6B7280;font-weight:500;">' + remaining + ' more Phase 1 session' + (remaining!==1?'s':'') + ' to unlock</span>'
+        + '<span style="color:#9CA3AF;">' + phase1Count + ' / ' + target + '</span>'
+        + '</div>'
+        + '<div style="background:#E5E7EB;border-radius:99px;height:6px;">'
+        + '<div style="background:linear-gradient(90deg,#10B981,#34D399);height:6px;border-radius:99px;width:' + pct + '%;"></div>'
+        + '</div>'
+        + '<p style="font-size:10px;color:#9CA3AF;margin-top:6px;">Unlocks at ' + required + ' sessions · aim for ' + target + ' (3 per week)</p>'
+        + '</div></div>';
+    }
+
+    return '<div onclick="selectWorkout(\'' + w.id + '\')" class="card" style="cursor:pointer;border-left:4px solid ' + borderColor + ';">'
+      + '<div style="display:flex;justify-content:space-between;align-items:center;">'
+      + '<div>'
+      + '<span class="pill ' + pillCls + '" style="margin-bottom:6px;display:inline-block;">' + w.phase + '</span>'
+      + '<h3 style="font-family:Oswald,sans-serif;font-size:20px;font-weight:700;color:#0D1B2E;">' + w.name + '</h3>'
+      + '<p style="color:#9CA3AF;font-size:11px;margin-top:2px;">' + count + ' exercises &nbsp;·&nbsp; ' + logged + ' session' + (logged!==1?'s':'') + ' logged</p>'
+      + '</div>'
+      + '<svg width="18" height="18" fill="none" stroke="#CBD5E1" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>'
+      + '</div></div>';
+  }).join('');
+
+  return '<div style="background:linear-gradient(160deg,#0D1B2E 0%,#1a3a5c 100%);min-height:100vh;padding-bottom:80px;">'
+    + '<div style="padding:40px 16px 24px;max-width:480px;margin:0 auto;">'
+    + '<button onclick="showView(\'programs\')" class="back-btn"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>Programs</button>'
+    + '<h1 style="font-family:Oswald,sans-serif;font-size:34px;font-weight:700;color:#fff;margin-bottom:4px;">' + p.name + '</h1>'
+    + '<p style="color:rgba(255,255,255,.4);font-size:13px;">' + p.schedule + '</p>'
+    + '</div>'
+    + '<div style="background:#F0F4FF;border-radius:24px 24px 0 0;min-height:70vh;padding:24px 16px 0;max-width:480px;margin:0 auto;">'
+    + cards + '</div></div>';
+}
+
+function selectWorkout(id) {
+  appState.workout = appState.program.workouts.find(function(w){ return w.id===id; });
+  appState.view = 'active';
+  render();
+}
+
+// ── ACTIVE WORKOUT ─────────────────────────────────────────────
+function viewActive() {
+  var w = appState.workout;
+  var p = appState.program;
+  var today = new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
+  var lastSess = getSessions().find(function(s){ return s.workout===w.name && s.program===p.name; });
+
+  var isP2 = w.phase === 'Phase 2';
+  var headerColor = isP2 ? 'linear-gradient(135deg,#78350f,#b45309)' : 'linear-gradient(135deg,#0D1B2E,#1e3a5f)';
+  var html = '<div style="background:#F0F4FF;min-height:100vh;padding-bottom:80px;">'
+    + '<div style="background:' + headerColor + ';padding:36px 16px 24px;max-width:480px;margin:0 auto;">'
+    + '<button onclick="appState.view=\'workouts\';render();" class="back-btn"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>Back</button>'
+    + '<p style="color:rgba(255,255,255,.6);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">' + p.name + ' · ' + w.phase + '</p>'
+    + '<h1 style="font-family:Oswald,sans-serif;font-size:34px;font-weight:700;color:#fff;margin-bottom:2px;">' + w.name + '</h1>'
+    + '<p style="color:rgba(255,255,255,.5);font-size:13px;">' + today + '</p>'
+    + '</div>'
+    + '<div style="max-width:480px;margin:0 auto;padding:20px 16px 0;">'
+    + '<div style="background:#DBEAFE;border-radius:12px;padding:12px 16px;margin-bottom:16px;font-size:12px;color:#1D4ED8;display:flex;align-items:center;gap:8px;">'
+    + '<svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>'
+    + (lastSess ? 'Last logged ' + new Date(lastSess.date).toLocaleDateString('en-GB',{day:'numeric',month:'short'}) + ' — tap any exercise name ▶ to open its video.' : 'Tap any exercise name ▶ to open the demo video.')
+    + '</div>';
+
+  w.groups.forEach(function(group) {
+    if (group.type === 'warmup') {
+      html += '<div style="background:#fff;border-radius:16px;padding:20px;margin-bottom:16px;border:1px solid #E5E7EB;">'
+        + '<h3 style="font-family:Oswald,sans-serif;font-size:12px;color:#2B8FD0;text-transform:uppercase;letter-spacing:.1em;margin-bottom:16px;">Warm-Up</h3>';
+      group.exercises.forEach(function(ex, i) {
+        var safeN = ex.name.replace(/'/g,'&#39;');
+        html += '<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">'
+          + '<input type="checkbox" id="wu-' + i + '" style="width:16px;height:16px;accent-color:#2B8FD0;flex-shrink:0;cursor:pointer;" />'
+          + '<button onclick="openVideo(\'' + safeN + '\',\'' + ex.video + '\')" style="color:#0D1B2E;font-size:13px;font-weight:500;text-align:left;background:none;border:none;cursor:pointer;flex:1;font-family:Inter,sans-serif;">' + ex.name + ' <span style="color:#2B8FD0;font-size:11px;">▶</span></button>'
+          + '<span style="color:#9CA3AF;font-size:11px;white-space:nowrap;">' + ex.reps + '</span>'
+          + '</div>';
+      });
+      html += '</div>';
+
+    } else if (group.type === 'working') {
+      html += '<div style="background:#fff;border-radius:16px;padding:20px;margin-bottom:16px;border:1px solid #E5E7EB;">'
+        + '<h3 style="font-family:Oswald,sans-serif;font-size:12px;color:#2B8FD0;text-transform:uppercase;letter-spacing:.1em;margin-bottom:16px;">' + group.name + '</h3>';
+
+      group.exercises.forEach(function(ex, ei) {
+        var key = group.name.replace(/\s/g,'') + '-' + ei;
+        var safeN = ex.name.replace(/'/g,'&#39;');
+        var lastEx = lastSess && lastSess.exercises.find(function(e){ return e.name===ex.name; });
+        var lastHint = '';
+        if (lastEx) {
+          var parts = lastEx.sets.filter(function(s){ return s.weight||s.reps; })
+            .map(function(s,i){ return 'S'+(i+1)+': '+(s.weight||'?')+'kg×'+(s.reps||'?'); });
+          if (parts.length) lastHint = '<p style="color:#9CA3AF;font-size:11px;margin-bottom:8px;">Last: ' + parts.join(' · ') + '</p>';
+        }
+
+        if (ei > 0) html += '<div style="border-top:1px solid #F3F4F6;margin:16px 0;"></div>';
+
+        html += '<div style="margin-bottom:4px;">'
+          + '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2px;">'
+          + '<button onclick="openVideo(\'' + safeN + '\',\'' + ex.video + '\')" style="color:#0D1B2E;font-size:13px;font-weight:600;text-align:left;background:none;border:none;cursor:pointer;font-family:Inter,sans-serif;">' + ex.name + ' <span style="color:#2B8FD0;font-size:11px;">▶</span></button>'
+          + '<span style="color:#9CA3AF;font-size:11px;margin-left:8px;white-space:nowrap;">' + ex.sets + ' × ' + ex.reps + '</span>'
+          + '</div>'
+          + lastHint
+          + '<div style="display:grid;grid-template-columns:32px 1fr 1fr;gap:4px;margin-bottom:4px;padding:0 4px;">'
+          + '<span style="font-size:10px;color:#9CA3AF;">SET</span>'
+          + '<span style="font-size:10px;color:#9CA3AF;text-align:center;">WEIGHT (kg)</span>'
+          + '<span style="font-size:10px;color:#9CA3AF;text-align:center;">REPS</span>'
+          + '</div>';
+
+        for (var si = 0; si < ex.sets; si++) {
+          html += '<div style="display:grid;grid-template-columns:32px 1fr 1fr;gap:4px;margin-bottom:6px;align-items:center;">'
+            + '<span style="font-size:11px;color:#6B7280;font-weight:500;padding-left:4px;">' + (si+1) + '</span>'
+            + '<input type="number" min="0" step="0.5" placeholder="kg" id="w-' + key + '-' + si + '" style="background:#F9FAFB;border:1px solid #E5E7EB;border-radius:10px;padding:10px 8px;text-align:center;font-size:13px;color:#0D1B2E;font-family:Inter,sans-serif;width:100%;outline:none;" onfocus="this.style.borderColor=\'#2B8FD0\'" onblur="this.style.borderColor=\'#E5E7EB\'" />'
+            + '<input type="number" min="0" placeholder="reps" id="r-' + key + '-' + si + '" style="background:#F9FAFB;border:1px solid #E5E7EB;border-radius:10px;padding:10px 8px;text-align:center;font-size:13px;color:#0D1B2E;font-family:Inter,sans-serif;width:100%;outline:none;" onfocus="this.style.borderColor=\'#2B8FD0\'" onblur="this.style.borderColor=\'#E5E7EB\'" />'
+            + '</div>';
+        }
+        html += '</div>';
+      });
+      html += '</div>';
+
+    } else if (group.type === 'finisher') {
+      var ex = group.exercises[0];
+      var safeN = ex.name.replace(/'/g,'&#39;');
+      html += '<div style="background:#fff;border-radius:16px;padding:20px;margin-bottom:16px;border:1px solid #E5E7EB;">'
+        + '<h3 style="font-family:Oswald,sans-serif;font-size:12px;color:#2B8FD0;text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px;">Finisher</h3>'
+        + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">'
+        + '<button onclick="openVideo(\'' + safeN + '\',\'' + ex.video + '\')" style="color:#0D1B2E;font-size:13px;font-weight:600;background:none;border:none;cursor:pointer;font-family:Inter,sans-serif;">' + ex.name + ' <span style="color:#2B8FD0;font-size:11px;">▶</span></button>'
+        + '<span style="color:#9CA3AF;font-size:11px;">' + ex.sets + ' × ' + ex.reps + '</span>'
+        + '</div>'
+        + '<label style="display:flex;align-items:center;gap:10px;cursor:pointer;">'
+        + '<input type="checkbox" id="finisher-done" style="width:16px;height:16px;accent-color:#2B8FD0;" />'
+        + '<span style="font-size:13px;color:#6B7280;">Mark complete</span>'
+        + '</label></div>';
+    }
+  });
+
+  html += '<div class="card">'
+    + '<label style="display:block;font-size:11px;color:#6B7280;font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em;">Session Notes</label>'
+    + '<textarea id="session-notes" rows="3" placeholder="How did it feel? Anything to flag for next time?" style="width:100%;background:#F9FAFB;border:1px solid #E5E7EB;border-radius:10px;padding:12px;font-size:13px;color:#0D1B2E;resize:none;outline:none;" onfocus="this.style.borderColor=\'#2B8FD0\'" onblur="this.style.borderColor=\'#E5E7EB\'"></textarea>'
+    + '</div>'
+    + '<button onclick="completeWorkout()" style="width:100%;background:linear-gradient(135deg,#0D1B2E,#1e3a5f);color:#fff;font-family:Oswald,sans-serif;font-size:20px;font-weight:700;padding:18px;border-radius:16px;border:none;cursor:pointer;margin-bottom:8px;box-shadow:0 4px 14px rgba(13,27,46,.3);">Complete Workout ✓</button>'
+    + '</div></div>';
+  return html;
+}
+
+function completeWorkout() {
+  var w = appState.workout;
+  var exercises = [];
+  w.groups.forEach(function(group) {
+    if (group.type !== 'working') return;
+    group.exercises.forEach(function(ex, ei) {
+      var key = group.name.replace(/\s/g,'') + '-' + ei;
+      var sets = [];
+      for (var si = 0; si < ex.sets; si++) {
+        sets.push({
+          weight: (document.getElementById('w-' + key + '-' + si)||{}).value || '',
+          reps:   (document.getElementById('r-' + key + '-' + si)||{}).value || '',
+        });
+      }
+      exercises.push({group:group.name, name:ex.name, prescribed:ex.sets+' × '+ex.reps, sets:sets});
+    });
+  });
+  saveSession({
+    id: Date.now(),
+    date: new Date().toISOString(),
+    program: appState.program.name,
+    workout: w.name,
+    phase: w.phase,
+    exercises: exercises,
+    notes: (document.getElementById('session-notes')||{}).value || '',
+  });
+  showView('history');
+}
+
+// ── HISTORY ────────────────────────────────────────────────────
+function viewHistory() {
+  var sessions = getSessions();
+  var cards = '';
+
+  if (!sessions.length) {
+    cards = '<div style="text-align:center;padding:80px 0;color:#9CA3AF;">'
+      + '<svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin:0 auto 16px;opacity:.3;display:block;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>'
+      + '<p style="font-weight:600;">No sessions yet.</p>'
+      + '<p style="font-size:13px;margin-top:4px;">Complete a workout to see history here.</p></div>';
+  } else {
+    sessions.forEach(function(s) {
+      var d = new Date(s.date);
+      var dateStr = d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+      var timeStr = d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+      var isP2 = s.phase === 'Phase 2';
+      var pillCls = isP2 ? 'pill-orange' : 'pill-green';
+      var borderColor = isP2 ? '#F59E0B' : '#10B981';
+      cards += '<div onclick="viewDetail(' + s.id + ')" class="card" style="cursor:pointer;border-left:4px solid ' + borderColor + ';">'
+        + '<div style="display:flex;justify-content:space-between;align-items:flex-start;">'
+        + '<div>'
+        + '<span class="pill ' + pillCls + '" style="margin-bottom:6px;display:inline-block;">' + s.program + ' · ' + s.phase + '</span>'
+        + '<h3 style="font-family:Oswald,sans-serif;font-size:18px;font-weight:700;color:#0D1B2E;">' + s.workout + '</h3>'
+        + '<p style="color:#9CA3AF;font-size:11px;margin-top:2px;">' + dateStr + ' · ' + timeStr + '</p>'
+        + '</div>'
+        + '<svg width="18" height="18" fill="none" stroke="#CBD5E1" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>'
+        + '</div>'
+        + (s.notes ? '<p style="color:#9CA3AF;font-size:11px;margin-top:10px;border-top:1px solid #F3F4F6;padding-top:10px;font-style:italic;">"' + s.notes.substring(0,90) + (s.notes.length>90?'…':'') + '"</p>' : '')
+        + '</div>';
+    });
+  }
+
+  return '<div style="background:linear-gradient(160deg,#0D1B2E 0%,#1a3a5c 100%);min-height:100vh;padding-bottom:80px;">'
+    + '<div style="padding:40px 16px 24px;max-width:480px;margin:0 auto;">'
+    + '<h1 style="font-family:Oswald,sans-serif;font-size:34px;font-weight:700;color:#fff;margin-bottom:4px;">History</h1>'
+    + '<p style="color:rgba(255,255,255,.4);font-size:13px;">' + sessions.length + ' session' + (sessions.length!==1?'s':'') + ' logged</p>'
+    + '</div>'
+    + '<div style="background:#F0F4FF;border-radius:24px 24px 0 0;min-height:70vh;padding:24px 16px 0;max-width:480px;margin:0 auto;">'
+    + cards
+    + '</div></div>';
+}
+
+function viewDetail() {
+  var s = getSessions().find(function(x){ return x.id === appState.sessionId; });
+  if (!s) return viewHistory();
+  var d = new Date(s.date);
+  var dateStr = d.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  var isP2 = s.phase === 'Phase 2';
+  var headerColor = isP2 ? 'linear-gradient(135deg,#78350f,#b45309)' : 'linear-gradient(135deg,#0D1B2E,#1e3a5f)';
+  var pillCls = isP2 ? 'pill-orange' : 'pill-green';
+
+  var currentGroup = '';
+  var exHtml = '';
+  s.exercises.forEach(function(ex) {
+    if (ex.group !== currentGroup) {
+      if (currentGroup) exHtml += '</div>';
+      exHtml += '<div class="card">'
+        + '<h3 style="font-family:Oswald,sans-serif;font-size:12px;color:#2B8FD0;text-transform:uppercase;letter-spacing:.1em;margin-bottom:16px;">' + ex.group + '</h3>';
+      currentGroup = ex.group;
+    }
+    var hasData = ex.sets.some(function(st){ return st.weight||st.reps; });
+    exHtml += '<div style="margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid #F3F4F6;">'
+      + '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">'
+      + '<p style="font-size:13px;font-weight:600;color:#0D1B2E;">' + ex.name + '</p>'
+      + '<span style="font-size:11px;color:#9CA3AF;">' + ex.prescribed + '</span>'
+      + '</div>'
+      + (hasData
+        ? ex.sets.map(function(set,i){ return (set.weight||set.reps)
+            ? '<div style="display:flex;align-items:center;gap:10px;font-size:13px;margin-bottom:3px;">'
+              + '<span style="font-size:11px;color:#9CA3AF;width:36px;">Set ' + (i+1) + '</span>'
+              + '<span style="font-weight:600;color:#0D1B2E;">' + (set.weight?set.weight+' kg':'—') + '</span>'
+              + '<span style="color:#D1D5DB;">×</span>'
+              + '<span style="font-weight:600;color:#0D1B2E;">' + (set.reps?set.reps+' reps':'—') + '</span>'
+              + '</div>' : '';
+          }).join('')
+        : '<p style="font-size:11px;color:#9CA3AF;font-style:italic;">No data recorded</p>')
+      + '</div>';
+  });
+  if (currentGroup) exHtml += '</div>';
+
+  if (s.notes) {
+    exHtml += '<div class="card">'
+      + '<h3 style="font-family:Oswald,sans-serif;font-size:12px;color:#2B8FD0;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;">Notes</h3>'
+      + '<p style="font-size:13px;color:#4B5563;">' + s.notes + '</p></div>';
+  }
+
+  exHtml += '<button onclick="deleteSession(' + s.id + ')" style="width:100%;border:1px solid #FCA5A5;color:#EF4444;font-size:13px;font-weight:600;padding:12px;border-radius:16px;background:none;cursor:pointer;font-family:Inter,sans-serif;margin-bottom:8px;">Delete Session</button>';
+
+  return '<div style="background:linear-gradient(160deg,#0D1B2E 0%,#1a3a5c 100%);min-height:100vh;padding-bottom:80px;">'
+    + '<div style="background:' + headerColor + ';padding:36px 16px 24px;max-width:480px;margin:0 auto;">'
+    + '<button onclick="showView(\'history\')" class="back-btn"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>History</button>'
+    + '<span class="pill ' + pillCls + '" style="margin-bottom:6px;display:inline-block;">' + s.program + ' · ' + s.phase + '</span>'
+    + '<h1 style="font-family:Oswald,sans-serif;font-size:34px;font-weight:700;color:#fff;margin-bottom:2px;">' + s.workout + '</h1>'
+    + '<p style="color:rgba(255,255,255,.5);font-size:13px;">' + dateStr + '</p>'
+    + '</div>'
+    + '<div style="background:#F0F4FF;border-radius:24px 24px 0 0;min-height:70vh;padding:24px 16px 0;max-width:480px;margin:0 auto;">'
+    + exHtml
+    + '</div></div>';
+}
+
+function viewDetail_go(id) {
+  appState.sessionId = id;
+  appState.view = 'detail';
+  render();
+}
+function viewDetail(id) { viewDetail_go(id); }
+
+function deleteSession(id) {
+  if (!confirm('Delete this session?')) return;
+  var all = getSessions().filter(function(s){ return s.id !== id; });
+  localStorage.setItem('cb_sessions', JSON.stringify(all));
+  showView('history');
+}
+
+// ── PROGRESS ───────────────────────────────────────────────────
+function viewProgress() {
+  var sessions = getSessions();
+  var allEx = [];
+  sessions.forEach(function(s){ s.exercises.forEach(function(e){ if (allEx.indexOf(e.name)<0) allEx.push(e.name); }); });
+
+  var header = '<div style="padding:40px 16px 24px;max-width:480px;margin:0 auto;">'
+    + '<h1 style="font-family:Oswald,sans-serif;font-size:34px;font-weight:700;color:#fff;margin-bottom:4px;">Progress</h1>'
+    + '<p style="color:rgba(255,255,255,.4);font-size:13px;">Best weight per session for each exercise.</p>'
+    + '</div>';
+
+  if (!allEx.length) {
+    return '<div style="background:linear-gradient(160deg,#0D1B2E 0%,#1a3a5c 100%);min-height:100vh;padding-bottom:80px;">'
+      + header
+      + '<div style="background:#F0F4FF;border-radius:24px 24px 0 0;min-height:70vh;padding:24px 16px 0;max-width:480px;margin:0 auto;">'
+      + '<div style="text-align:center;padding:80px 0;color:#9CA3AF;">'
+      + '<svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin:0 auto 16px;opacity:.3;display:block;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>'
+      + '<p style="font-weight:600;">No data yet.</p><p style="font-size:13px;margin-top:4px;">Log a few sessions to track your progress.</p></div>'
+      + '</div></div>';
+  }
+
+  if (!appState.progressExercise) appState.progressExercise = allEx[0];
+  var sel = appState.progressExercise;
+
+  var exData = sessions
+    .filter(function(s){ return s.exercises.some(function(e){ return e.name===sel; }); })
+    .map(function(s){
+      var ex = s.exercises.find(function(e){ return e.name===sel; });
+      var max = Math.max.apply(null, ex.sets.map(function(st){ return parseFloat(st.weight)||0; }));
+      return { date: new Date(s.date).toLocaleDateString('en-GB',{day:'numeric',month:'short'}), weight: max };
+    }).reverse();
+
+  var opts = allEx.map(function(e){
+    return '<option value="' + e + '"' + (e===sel?' selected':'') + '>' + e + '</option>';
+  }).join('');
+
+  var rows = exData.map(function(d){
+    return '<div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid #F3F4F6;">'
+      + '<span style="color:#6B7280;">' + d.date + '</span>'
+      + '<span style="font-weight:600;color:#0D1B2E;">' + (d.weight>0?d.weight+' kg':'—') + '</span>'
+      + '</div>';
+  }).join('');
+
+  return '<div style="background:linear-gradient(160deg,#0D1B2E 0%,#1a3a5c 100%);min-height:100vh;padding-bottom:80px;">'
+    + header
+    + '<div style="background:#F0F4FF;border-radius:24px 24px 0 0;min-height:70vh;padding:24px 16px 0;max-width:480px;margin:0 auto;">'
+    + '<div class="card">'
+    + '<label style="display:block;font-size:11px;color:#6B7280;font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Exercise</label>'
+    + '<select onchange="appState.progressExercise=this.value;render();" style="width:100%;background:#F9FAFB;border:1px solid #E5E7EB;border-radius:10px;padding:10px 12px;font-size:13px;font-family:Inter,sans-serif;color:#0D1B2E;outline:none;">' + opts + '</select>'
+    + '</div>'
+    + (exData.length > 1
+        ? '<div class="card"><canvas id="progress-chart"></canvas></div>'
+        : '<div class="card" style="text-align:center;color:#9CA3AF;font-size:13px;padding:32px;">Log 2+ sessions with this exercise to see a trend chart.</div>')
+    + '<div class="card">'
+    + '<h3 style="font-family:Oswald,sans-serif;font-size:12px;color:#2B8FD0;text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px;">Session Log</h3>'
+    + rows + '</div></div></div>';
+}
+
+function drawChart() {
+  var canvas = document.getElementById('progress-chart');
+  if (!canvas || !appState.progressExercise) return;
+  var sel = appState.progressExercise;
+  var sessions = getSessions();
+  var exData = sessions
+    .filter(function(s){ return s.exercises.some(function(e){ return e.name===sel; }); })
+    .map(function(s){
+      var ex = s.exercises.find(function(e){ return e.name===sel; });
+      var max = Math.max.apply(null, ex.sets.map(function(st){ return parseFloat(st.weight)||0; }));
+      return { date: new Date(s.date).toLocaleDateString('en-GB',{day:'numeric',month:'short'}), weight: max };
+    }).reverse();
+  new Chart(canvas, {
+    type:'line',
+    data:{
+      labels: exData.map(function(d){ return d.date; }),
+      datasets:[{
+        label:'Best weight (kg)',
+        data: exData.map(function(d){ return d.weight; }),
+        borderColor:'#2B8FD0',
+        backgroundColor:'rgba(43,143,208,0.08)',
+        borderWidth:2,
+        pointBackgroundColor:'#2B8FD0',
+        pointRadius:4,
+        tension:0.3,
+        fill:true,
+      }]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{display:false}},
+      scales:{
+        y:{beginAtZero:false, ticks:{font:{size:11}}, grid:{color:'#F3F4F6'}},
+        x:{ticks:{font:{size:11}}, grid:{display:false}},
+      }
+    }
+  });
+}
+
+// ── INIT ──────────────────────────────────────────────────────
+render();
+</script>
+</body>
+</html>
