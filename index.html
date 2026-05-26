@@ -200,6 +200,19 @@ const PROGRAMS = [
 </nav>
 
 <script>
+// ── ACCESS CODE ────────────────────────────────────────────────
+var ACCESS_CODE = 'COMEBACK25';
+function isUnlocked() {
+  return localStorage.getItem('cb_unlocked') === '1';
+}
+function unlock(code) {
+  if (code.trim().toUpperCase() === ACCESS_CODE) {
+    localStorage.setItem('cb_unlocked', '1');
+    return true;
+  }
+  return false;
+}
+
 // ── STATE ──────────────────────────────────────────────────────
 var appState = {
   view: 'programs',
@@ -207,6 +220,7 @@ var appState = {
   workout: null,
   sessionId: null,
   progressExercise: null,
+  codeError: false,
 };
 
 // ── STORAGE ────────────────────────────────────────────────────
@@ -227,6 +241,14 @@ function openVideo(name, url) {
 
 // ── NAVIGATION ─────────────────────────────────────────────────
 function showView(v) {
+  // Progress and history require unlock
+  if ((v === 'progress' || v === 'history') && !isUnlocked()) {
+    appState.program = null;
+    appState.codeError = false;
+    appState.view = 'lock';
+    render();
+    return;
+  }
   appState.view = v;
   ['programs','progress','history'].forEach(function(id) {
     var el = document.getElementById('nav-' + id);
@@ -236,19 +258,62 @@ function showView(v) {
   render();
 }
 
+// ── LOCK SCREEN ────────────────────────────────────────────────
+function viewLock() {
+  return '<div style="background:linear-gradient(160deg,#0D1B2E 0%,#1a3a5c 100%);min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:40px 24px;text-align:center;">'
+    + '<div style="width:64px;height:64px;background:rgba(245,120,42,.15);border-radius:20px;display:flex;align-items:center;justify-content:center;margin:0 auto 24px;">'
+    + '<svg width="28" height="28" fill="none" stroke="#F5782A" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>'
+    + '</div>'
+    + '<h2 style="font-family:Oswald,sans-serif;font-size:28px;font-weight:700;color:#fff;margin-bottom:8px;">Client Access Only</h2>'
+    + '<p style="color:rgba(255,255,255,.5);font-size:14px;line-height:1.6;max-width:300px;margin:0 auto 32px;">This program is available to enrolled clients. Enter your access code to unlock.</p>'
+    + '<div style="width:100%;max-width:320px;">'
+    + '<input id="access-input" type="text" placeholder="Enter access code" style="width:100%;background:rgba(255,255,255,.08);border:1px solid ' + (appState.codeError ? '#EF4444' : 'rgba(255,255,255,.15)') + ';border-radius:12px;padding:14px 16px;font-size:16px;color:#fff;font-family:Inter,sans-serif;text-align:center;text-transform:uppercase;letter-spacing:.1em;outline:none;margin-bottom:12px;" />'
+    + (appState.codeError ? '<p style="color:#FCA5A5;font-size:13px;margin-bottom:12px;">Incorrect code. Please try again.</p>' : '')
+    + '<button id="access-submit" style="width:100%;background:#F5782A;color:#fff;font-family:Oswald,sans-serif;font-size:18px;font-weight:700;padding:14px;border-radius:12px;border:none;cursor:pointer;">Unlock Program</button>'
+    + '</div>'
+    + '<p style="color:rgba(255,255,255,.2);font-size:12px;margin-top:28px;">Don\'t have a code? <a href="https://wa.me/97452086673" target="_blank" style="color:#F5782A;text-decoration:none;">Contact MK</a></p>'
+    + '<button onclick="showView(\'programs\')" style="background:none;border:none;color:rgba(255,255,255,.3);font-size:13px;cursor:pointer;margin-top:16px;font-family:Inter,sans-serif;">← Back to Programs</button>'
+    + '</div>';
+}
+
 // ── RENDER ─────────────────────────────────────────────────────
 function render() {
   var app = document.getElementById('app');
   var html = '';
-  if (appState.view === 'programs')  html = viewPrograms();
-  else if (appState.view === 'workouts') html = viewWorkouts();
-  else if (appState.view === 'active')   html = viewActive();
-  else if (appState.view === 'history')  html = viewHistory();
-  else if (appState.view === 'detail')   html = viewDetail();
-  else if (appState.view === 'progress') html = viewProgress();
+  if (appState.view === 'lock')       html = viewLock();
+  else if (appState.view === 'programs')  html = viewPrograms();
+  else if (appState.view === 'workouts')  html = viewWorkouts();
+  else if (appState.view === 'active')    html = viewActive();
+  else if (appState.view === 'history')   html = viewHistory();
+  else if (appState.view === 'detail')    html = viewDetail();
+  else if (appState.view === 'progress')  html = viewProgress();
   app.innerHTML = html;
   app.className = 'fade-in';
   if (appState.view === 'progress') setTimeout(drawChart, 80);
+
+  // Attach lock screen listeners after render
+  var input  = document.getElementById('access-input');
+  var submit = document.getElementById('access-submit');
+  if (submit) {
+    submit.addEventListener('click', function() {
+      var code = (input || {}).value || '';
+      if (unlock(code)) {
+        appState.codeError = false;
+        appState.view = 'workouts';
+        render();
+      } else {
+        appState.codeError = true;
+        render();
+      }
+    });
+  }
+  if (input) {
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') submit && submit.click();
+    });
+    // Auto-focus
+    setTimeout(function(){ input.focus(); }, 80);
+  }
 }
 
 // ── PROGRAMS ───────────────────────────────────────────────────
@@ -343,7 +408,8 @@ function viewPrograms() {
 
 function selectProgram(id) {
   appState.program = PROGRAMS.find(function(p){ return p.id === id; });
-  appState.view = 'workouts';
+  appState.codeError = false;
+  appState.view = isUnlocked() ? 'workouts' : 'lock';
   render();
 }
 
