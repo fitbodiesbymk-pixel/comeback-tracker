@@ -824,6 +824,10 @@ function drawChart() {
 }
 
 // ── INIT ──────────────────────────────────────────────────────
+if (isUnlocked() && PROGRAMS.length === 1) {
+  appState.program = PROGRAMS[0];
+  appState.view = 'workouts';
+}
 render();
 </script>
 </body>
