@@ -10,7 +10,17 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     *{box-sizing:border-box;margin:0;padding:0;}
-    :root{--accent:#059669;--accent-dim:rgba(5,150,105,.15);--bg:#F8F7F4;--card:#FFFFFF;--text:#1C1C1C;--muted:#6B7280;--border:#E5E7EB;}
+    :root{
+      --accent: #8B5CF6;
+      --accent-shadow: rgba(139,92,246,.4);
+      --fit:    #10B981;
+      --bg:     #F8F7F4;
+      --card:   #FFFFFF;
+      --text:   #1C1C1C;
+      --muted:  #6B7280;
+      --border: #E5E7EB;
+      --gold:   #F59E0B;
+    }
     body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);min-height:100vh;color:var(--text);}
     h1,h2,h3,h4{font-weight:800;letter-spacing:-0.5px;}
     input[type=number]{-moz-appearance:textfield;}
@@ -21,16 +31,17 @@
     @keyframes spin{to{transform:rotate(360deg)}}
     .nav-active{color:var(--accent);border-bottom:2px solid var(--accent);}
     .nav-off{color:#9CA3AF;border-bottom:2px solid transparent;}
-    .pill{display:inline-block;background:#DBEAFE;color:#1D4ED8;font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;}
+    .pill{display:inline-block;background:#EDE9FE;color:#5B21B6;font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;}
     .pill-green{background:#DCFCE7;color:#166534;}
     .pill-orange{background:#FEF3C7;color:#92400E;}
     .card{background:var(--card);border-radius:14px;padding:20px;margin-bottom:14px;border:1px solid var(--border);box-shadow:0 1px 4px rgba(0,0,0,.05);}
     .back-btn{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:13px;background:none;border:none;cursor:pointer;margin-bottom:16px;padding:0;}
     .back-btn:hover{color:var(--text);}
-    /* ── Home page sections (Lifestacks-style) ── */
+    /* ── Hero (Lifestacks exact) ── */
     .hero{background:linear-gradient(135deg,#1C1C2E 0%,#2D1B69 50%,#1C1C2E 100%);color:#fff;padding:80px 24px 72px;position:relative;overflow:hidden;}
     .hero::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(245,158,11,.15) 0%,transparent 60%),radial-gradient(ellipse at 80% 50%,rgba(139,92,246,.15) 0%,transparent 60%);pointer-events:none;}
     .hero-pill{display:inline-block;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.8);font-size:.72rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:6px 16px;border-radius:999px;margin-bottom:24px;}
+    /* ── Sections (Lifestacks exact) ── */
     .ls-section{max-width:700px;margin:0 auto;padding:64px 24px;}
     .ls-section-label{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--accent);margin-bottom:12px;}
     .ls-section h2{font-size:clamp(1.6rem,4vw,2.4rem);font-weight:800;letter-spacing:-0.5px;line-height:1.15;margin-bottom:20px;color:var(--text);}
@@ -38,12 +49,15 @@
     .ls-section p strong{color:var(--text);}
     .section-white{background:#fff;border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
     .section-light{background:var(--bg);}
-    .section-dark{background:linear-gradient(135deg,#0D1B2E 0%,#0f2d1e 100%);color:#fff;}
-    .quote-block{border-left:4px solid var(--accent);padding:16px 20px;background:#F0FDF4;border-radius:0 12px 12px 0;margin:20px 0;}
+    .section-dark{background:linear-gradient(135deg,#1C1C2E 0%,#2D1B69 100%);color:#fff;}
+    .quote-block{border-left:4px solid var(--accent);padding:16px 20px;background:#F5F3FF;border-radius:0 12px 12px 0;margin:20px 0;}
     .principle-row{display:flex;gap:16px;margin-bottom:24px;align-items:flex-start;}
-    .principle-icon{width:44px;height:44px;border-radius:14px;background:#ECFDF5;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:20px;}
-    .cta-btn{display:inline-block;background:var(--accent);color:#fff;font-size:1rem;font-weight:700;padding:16px 36px;border-radius:12px;border:none;cursor:pointer;letter-spacing:.3px;box-shadow:0 4px 24px rgba(5,150,105,.35);transition:transform .15s,box-shadow .15s;}
-    .cta-btn:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(5,150,105,.45);}
+    .principle-icon{width:44px;height:44px;border-radius:14px;background:#EDE9FE;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:20px;}
+    /* ── CTA button (Lifestacks exact) ── */
+    .cta-btn{display:inline-block;background:var(--accent);color:#fff;font-size:1rem;font-weight:700;padding:16px 36px;border-radius:12px;border:none;cursor:pointer;letter-spacing:.3px;box-shadow:0 4px 24px var(--accent-shadow);transition:transform .15s,box-shadow .15s;text-decoration:none;}
+    .cta-btn:hover{transform:translateY(-2px);box-shadow:0 8px 32px var(--accent-shadow);}
+    /* ── Fitness green kept for workout elements ── */
+    .fit-btn{background:var(--fit);box-shadow:0 4px 14px rgba(16,185,129,.25);}
   </style>
 </head>
 <body style="padding-bottom:80px;">
@@ -446,8 +460,14 @@ async function boot(user) {
     cachedSessions = JSON.parse(localStorage.getItem('cb_sessions') || '[]');
   }
   authResolved = true;
-  appState.view = 'home';
-  updateNav('home');
+  // Already set up — go straight to programs
+  if (uid && isUnlocked('phase1')) {
+    appState.view = 'programs';
+    updateNav('programs');
+  } else {
+    appState.view = 'home';
+    updateNav('home');
+  }
   render();
 }
 
@@ -512,111 +532,62 @@ function viewLock() {
     + '</div>';
 }
 
-// ── HOME / PHILOSOPHY ──────────────────────────────────────────
+// ── HOME — CLIENT ENTRY POINT ─────────────────────────────────
 function viewHome() {
-  var ctaLabel = (uid && isUnlocked('phase1')) ? 'Open My Program →' : 'Enter Your Code →';
+  var isReady = uid && isUnlocked('phase1');
 
-  var principles = [
-    ['🏋️', 'Total-Body Training', 'Every session works your whole body. Three to four days a week of full-body training outperforms any split routine for people who want lasting results without living in the gym.'],
-    ['🔁', 'Compound Movements', 'We choose exercises that move multiple joints at once — more value per rep, more muscle engaged, and more carry-over to real life.'],
-    ['⚖️', 'Unilateral Priority', 'Single-arm. Single-leg. These movements catch imbalances your body has built up over the years and fix them before they become injuries.'],
-    ['✅', 'Low Risk, High Reward', 'Every exercise earns its place. If the joint cost is too high, there is a better option. Training should build you up, not break you down.'],
-    ['🎯', 'Minimal Effective Dose', 'More is not better — the right amount is better. Two focused sessions a week beats six mediocre ones. Consistency is the goal, not exhaustion.'],
-  ];
-  var principleRows = principles.map(function(p) {
-    return '<div class="principle-row">'
-      + '<div class="principle-icon">' + p[0] + '</div>'
-      + '<div><p style="font-size:1rem;font-weight:700;color:var(--text);margin-bottom:4px;">' + p[1] + '</p>'
-      + '<p style="font-size:.92rem;color:var(--muted);line-height:1.65;">' + p[2] + '</p></div>'
+  // ── Action block (sign-in / code / go) ───────────────────────
+  var actionBlock = '';
+  if (isReady) {
+    actionBlock = '<div style="margin-top:32px;">'
+      + '<button onclick="showView(\'programs\')" class="cta-btn" style="width:100%;font-size:1.05rem;padding:18px;text-align:center;">Open My Program →</button>'
+      + '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding:0 4px;">'
+      + '<p style="font-size:.82rem;color:rgba(255,255,255,.5);">Signed in · progress synced</p>'
+      + '<button onclick="signOut()" style="font-size:.78rem;color:rgba(255,255,255,.45);background:none;border:none;cursor:pointer;">Sign out</button>'
+      + '</div></div>';
+  } else if (!uid) {
+    actionBlock = '<div style="margin-top:32px;">'
+      + '<button id="google-signin" style="display:flex;align-items:center;justify-content:center;gap:12px;width:100%;background:#fff;border:none;border-radius:12px;padding:16px 24px;font-size:1rem;font-weight:700;color:#1C1C1C;cursor:pointer;box-shadow:0 4px 24px rgba(0,0,0,.2);">'
+      + '<svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>'
+      + 'Sign in with Google'
+      + '</button>'
+      + '<p style="font-size:.78rem;color:rgba(255,255,255,.4);text-align:center;margin-top:12px;">Sign in to unlock your workouts</p>'
       + '</div>';
-  }).join('');
-
-  var structureRows = [
-    ['Phase 1', 'Weeks 1–6', 'Foundation', 'Weeks 1–3 alternate Workout 1 & 2 · Weeks 4–6 alternate Workout 3 & 4', '#ECFDF5', '#059669'],
-    ['Phase 2', 'Weeks 7–12', 'Build', 'Weeks 7–9 alternate Workout 5 & 6 · Weeks 10–12 alternate Workout 7 & 8', '#FEF3C7', '#D97706'],
-  ].map(function(r) {
-    return '<div style="background:' + r[4] + ';border-radius:14px;padding:20px;margin-bottom:12px;">'
-      + '<p style="font-size:1.1rem;font-weight:800;color:var(--text);letter-spacing:-0.3px;">' + r[0] + ' <span style="font-weight:600;font-size:.85rem;color:' + r[5] + ';">' + r[1] + ' · ' + r[2] + '</span></p>'
-      + '<p style="font-size:.85rem;color:#4B5563;line-height:1.5;margin-top:6px;">' + r[3] + '</p>'
+  } else {
+    // signed in, no code yet
+    actionBlock = '<div style="margin-top:32px;">'
+      + '<input id="access-input" type="text" placeholder="Enter your access code" autocomplete="off" style="width:100%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.25);border-radius:12px;padding:16px;font-size:1rem;color:#fff;text-align:center;text-transform:uppercase;letter-spacing:.12em;outline:none;margin-bottom:10px;::-webkit-input-placeholder{color:rgba(255,255,255,.4)}" />'
+      + (appState.codeError === 'wrong' ? '<p style="color:#FCA5A5;font-size:.82rem;text-align:center;margin-bottom:10px;">Incorrect code — check with MK</p>' : '')
+      + (appState.codeError === 'need-sessions' ? '<p style="color:#FDE68A;font-size:.82rem;text-align:center;margin-bottom:10px;">Complete more Phase 1 sessions first</p>' : '')
+      + '<button id="access-submit" class="cta-btn" style="width:100%;font-size:1rem;padding:16px;text-align:center;">Unlock My Program</button>'
+      + '<p style="font-size:.78rem;color:rgba(255,255,255,.4);text-align:center;margin-top:12px;">Need a code? <a href="https://wa.me/97452086673" target="_blank" style="color:rgba(255,255,255,.6);text-decoration:none;">Contact MK →</a></p>'
       + '</div>';
-  }).join('');
-
-  var signInRow = !uid
-    ? '<div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;" onclick="showView(\'auth\')">'
-      + '<div><p style="font-size:.95rem;font-weight:700;color:var(--text);">Sign in to save progress</p>'
-      + '<p style="font-size:.82rem;color:var(--muted);">Sync workouts across all your devices</p></div>'
-      + '<svg width="18" height="18" fill="none" stroke="#CBD5E1" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>'
-      + '</div>'
-    : '<div style="background:#ECFDF5;border:1px solid #A7F3D0;border-radius:14px;padding:16px 20px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;">'
-      + '<p style="font-size:.88rem;color:#065F46;font-weight:600;">Signed in · synced across devices</p>'
-      + '<button onclick="signOut()" style="font-size:.78rem;color:var(--muted);background:none;border:none;cursor:pointer;">Sign out</button>'
-      + '</div>';
+  }
 
   return '<div style="background:var(--bg);min-height:100vh;padding-bottom:24px;">'
 
-    // Hero — Lifestacks style
+    // Hero
     + '<div class="hero">'
-    + '<div style="max-width:640px;margin:0 auto;position:relative;">'
+    + '<div style="max-width:540px;margin:0 auto;position:relative;">'
     + '<div class="hero-pill">Strength Training Philosophy</div>'
     + '<h1 style="font-size:clamp(3rem,10vw,5rem);font-weight:800;letter-spacing:-2px;line-height:1;margin-bottom:16px;white-space:nowrap;">Comeback <span style="color:#8B5CF6;">Strong</span></h1>'
-    + '<p style="font-size:clamp(1rem,2.5vw,1.2rem);color:rgba(255,255,255,.65);max-width:520px;margin:0 0 40px;line-height:1.65;">Five principles. Twelve weeks. A simple, no-fluff program for building real strength — and staying strong for life.</p>'
-    + '<button onclick="showView(\'programs\')" class="cta-btn">' + ctaLabel + '</button>'
+    + '<p style="font-size:clamp(1rem,2.5vw,1.15rem);color:rgba(255,255,255,.65);max-width:460px;line-height:1.65;">Five principles. Twelve weeks. A simple, no-fluff program for building real strength — and staying strong for life.</p>'
+    + actionBlock
     + '</div></div>'
 
-    // Philosophy
-    + '<div class="section-white">'
-    + '<div class="ls-section">'
-    + '<div class="ls-section-label">The Philosophy</div>'
-    + '<h2>Simple. Not Easy.</h2>'
-    + '<p>Training at 40+ looks different — and it should. The goal isn\'t to push harder. It\'s to train <strong>smarter</strong>. More intentional. Built to complement your life, not compete with it.</p>'
-    + '<div class="quote-block" style="margin:24px 0;">'
-    + '<p style="font-size:1.05rem;color:#065F46;line-height:1.6;font-style:italic;">"We\'re not in the fitness business. We\'re in the life-changing business."</p>'
-    + '<p style="font-size:.82rem;color:var(--muted);margin-top:8px;font-style:normal;">— Mike Boyle, Mike Boyle Strength &amp; Conditioning</p>'
+    // About (collapsed accordion — minimal, not the focus)
+    + '<div style="max-width:700px;margin:0 auto;padding:32px 24px 0;">'
+    + '<div style="background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;">'
+    + '<button onclick="var b=document.getElementById(\'about-body\');var a=document.getElementById(\'about-arrow\');var o=b.style.display!==\'none\';b.style.display=o?\'none\':\'block\';a.style.transform=o?\'rotate(0deg)\':\'rotate(180deg)\';" style="width:100%;display:flex;justify-content:space-between;align-items:center;padding:18px 20px;background:none;border:none;cursor:pointer;">'
+    + '<span style="font-size:.95rem;font-weight:700;color:var(--text);">About this program</span>'
+    + '<svg id="about-arrow" width="16" height="16" fill="none" stroke="#9CA3AF" viewBox="0 0 24 24" style="transition:transform .2s;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>'
+    + '</button>'
+    + '<div id="about-body" style="display:none;padding:0 20px 20px;border-top:1px solid var(--border);">'
+    + '<p style="font-size:.95rem;color:var(--muted);line-height:1.7;margin-top:16px;">Comeback Strong is built on five training principles: total-body sessions, compound movements, unilateral focus, low-risk choices, and the minimal effective dose. No fluff — just the work that counts.</p>'
+    + '<p style="font-size:.95rem;color:var(--muted);line-height:1.7;"><strong style="color:var(--text);">Phase 1 (Weeks 1–6):</strong> Weeks 1–3 alternate Workout 1 &amp; 2. Weeks 4–6 alternate Workout 3 &amp; 4.</p>'
+    + '<p style="font-size:.95rem;color:var(--muted);line-height:1.7;margin-bottom:0;"><strong style="color:var(--text);">Phase 2 (Weeks 7–12):</strong> Unlocks with a separate code after completing Phase 1.</p>'
+    + '</div></div>'
     + '</div>'
-    + '<p>Every workout in this program is purposeful. No fluff. No junk volume. Just the movements that give you the most return on your time — so you can be strong in the gym and even stronger outside it.</p>'
-    + '</div></div>'
-
-    // Principles
-    + '<div class="section-light">'
-    + '<div class="ls-section">'
-    + '<div class="ls-section-label">How We Train</div>'
-    + '<h2>Five Principles Behind Every Session</h2>'
-    + principleRows
-    + '</div></div>'
-
-    // Program Structure
-    + '<div class="section-white">'
-    + '<div class="ls-section">'
-    + '<div class="ls-section-label">The Structure</div>'
-    + '<h2>12 Weeks. Two Phases.</h2>'
-    + '<p>Each phase builds on the last — supported to unsupported, unloaded to loaded, simple to complex. <strong>You earn Phase 2 by completing Phase 1.</strong></p>'
-    + structureRows
-    + '<div style="background:var(--bg);border-radius:14px;padding:16px 20px;margin-top:8px;">'
-    + '<p style="font-size:.88rem;font-weight:700;color:var(--text);margin-bottom:10px;">What to expect</p>'
-    + '<div style="display:flex;flex-wrap:wrap;gap:8px;">'
-    + '<span style="background:#E0F2FE;color:#0369A1;font-size:.78rem;font-weight:700;padding:4px 12px;border-radius:999px;">45–60 min</span>'
-    + '<span style="background:#E0F2FE;color:#0369A1;font-size:.78rem;font-weight:700;padding:4px 12px;border-radius:999px;">2–3×/week</span>'
-    + '<span style="background:#E0F2FE;color:#0369A1;font-size:.78rem;font-weight:700;padding:4px 12px;border-radius:999px;">Dumbbells + bench</span>'
-    + '<span style="background:#E0F2FE;color:#0369A1;font-size:.78rem;font-weight:700;padding:4px 12px;border-radius:999px;">Video for every move</span>'
-    + '</div></div>'
-    + '</div></div>'
-
-    // About MK
-    + '<div class="section-dark">'
-    + '<div class="ls-section" style="padding-top:64px;padding-bottom:64px;">'
-    + '<div style="color:rgba(255,255,255,.5);font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px;">Your Coach</div>'
-    + '<h2 style="color:#fff;margin-bottom:20px;">Built by MK</h2>'
-    + '<p style="color:rgba(255,255,255,.72);">MK is a certified personal trainer and strength coach based in Doha, Qatar. She specialises in helping people over 40 build genuine strength, move better, and feel confident in their bodies again.</p>'
-    + '<p style="color:rgba(255,255,255,.72);">Comeback Strong is her signature 12-week program — built on proven principles, designed around the life you\'re actually living.</p>'
-    + '<a href="https://wa.me/97452086673" target="_blank" style="display:inline-block;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:.95rem;font-weight:700;padding:14px 28px;border-radius:12px;text-decoration:none;margin-top:8px;">Contact MK on WhatsApp →</a>'
-    + '</div></div>'
-
-    // CTA strip
-    + '<div class="section-light">'
-    + '<div class="ls-section" style="padding-top:48px;padding-bottom:48px;">'
-    + signInRow
-    + '<button onclick="showView(\'programs\')" class="cta-btn" style="width:100%;justify-content:center;font-size:1.05rem;padding:18px;">' + ctaLabel + '</button>'
-    + '</div></div>'
 
     + '<footer style="text-align:center;padding:32px 24px;font-size:.8rem;color:var(--muted);">'
     + '<a href="https://fitbodiesbymk-pixel.github.io/builtbymk/" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;">Built by BuiltByMK</a>'
@@ -870,7 +841,7 @@ function viewActive() {
     + '<label style="display:block;font-size:11px;color:#6B7280;font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em;">Session Notes</label>'
     + '<textarea id="session-notes" rows="3" placeholder="How did it feel? Anything to flag for next time?" style="width:100%;background:#F9FAFB;border:1px solid #E5E7EB;border-radius:10px;padding:12px;font-size:13px;color:#0D1B2E;resize:none;outline:none;" onfocus="this.style.borderColor=\'#059669\'" onblur="this.style.borderColor=\'#E5E7EB\'"></textarea>'
     + '</div>'
-    + '<button onclick="completeWorkout()" style="width:100%;background:#059669;color:#fff;font-weight:800;letter-spacing:-0.3px;font-size:20px;font-weight:700;padding:18px;border-radius:16px;border:none;cursor:pointer;margin-bottom:8px;box-shadow:0 4px 14px rgba(5,150,105,.25);">Complete Workout ✓</button>'
+    + '<button onclick="completeWorkout()" class="cta-btn fit-btn" style="width:100%;font-size:1.1rem;padding:18px;text-align:center;border-radius:14px;margin-bottom:8px;">Complete Workout ✓</button>'
     + '</div></div>';
   return html;
 }
