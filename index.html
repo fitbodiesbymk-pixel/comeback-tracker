@@ -575,6 +575,23 @@ function viewHome() {
     + actionBlock
     + '</div></div>'
 
+    // Getting started (only shown when not yet set up)
+    + (!isReady ? '<div style="max-width:700px;margin:0 auto;padding:32px 24px 0;">'
+      + '<p style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--accent);margin-bottom:16px;">Getting Started</p>'
+      + '<div style="display:flex;flex-direction:column;gap:12px;">'
+      + [
+          ['1', 'Sign in with Google', 'Tap the button above. This creates your account and saves your progress across all devices — no password needed.'],
+          ['2', 'Enter your access code', 'You\'ll receive a code from MK when you join the program. Enter it once and you\'re unlocked permanently.'],
+          ['3', 'Start training', 'Go to the Programs tab, pick your workout, and log your sets. Your data saves automatically after every session.'],
+        ].map(function(s) {
+          return '<div style="display:flex;gap:16px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 20px;">'
+            + '<div style="width:28px;height:28px;border-radius:999px;background:var(--accent);color:#fff;font-size:.82rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">' + s[0] + '</div>'
+            + '<div><p style="font-size:.95rem;font-weight:700;color:var(--text);margin-bottom:4px;">' + s[1] + '</p>'
+            + '<p style="font-size:.85rem;color:var(--muted);line-height:1.55;">' + s[2] + '</p></div>'
+            + '</div>';
+        }).join('')
+      + '</div></div>' : '')
+
     // About (collapsed accordion — minimal, not the focus)
     + '<div style="max-width:700px;margin:0 auto;padding:32px 24px 0;">'
     + '<div style="background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;">'
