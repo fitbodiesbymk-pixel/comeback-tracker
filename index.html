@@ -4,51 +4,56 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Comeback Strong | Fitbodies by MK</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
   <style>
-    *{box-sizing:border-box;}
+    *{box-sizing:border-box;margin:0;padding:0;}
     body{font-family:'Inter',sans-serif;background:#F9FAFB;min-height:100vh;color:#1C1C1C;}
     h1,h2,h3,h4{font-family:'Oswald',sans-serif;}
     input[type=number]{-moz-appearance:textfield;}
     input[type=number]::-webkit-inner-spin-button,
     input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;}
-    .fade-in{animation:fi .18s ease;}
-    @keyframes fi{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+    .fade-in{animation:fi .2s ease;}
+    @keyframes fi{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes spin{to{transform:rotate(360deg)}}
     .nav-active{color:#059669;border-bottom:2px solid #059669;}
     .nav-off{color:#9CA3AF;border-bottom:2px solid transparent;}
     .pill{display:inline-block;background:#DBEAFE;color:#1D4ED8;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;}
     .pill-green{background:#DCFCE7;color:#166534;}
     .pill-orange{background:#FEF3C7;color:#92400E;}
     .card{background:#fff;border-radius:20px;padding:20px;margin-bottom:14px;border:1px solid #E5E7EB;box-shadow:0 2px 8px rgba(0,0,0,.06);}
-    .card:hover{border-color:#059669;}
-    .page{max-width:480px;margin:0 auto;padding:28px 16px 0;}
-    .section-header{background:#fff;border-bottom:1px solid #E5E7EB;border-radius:20px 20px 0 0;padding:28px 20px 20px;margin-bottom:0;}
     .back-btn{display:flex;align-items:center;gap:6px;color:rgba(0,0,0,.45);font-size:13px;background:none;border:none;cursor:pointer;margin-bottom:16px;font-family:Inter,sans-serif;padding:0;}
     .back-btn:hover{color:#111827;}
     input,select,textarea{font-family:'Inter',sans-serif;}
+    .hero{background:linear-gradient(160deg,#0D1B2E 0%,#0f3040 55%,#0a2518 100%);color:#fff;padding:64px 24px 56px;}
+    .section-white{background:#fff;padding:40px 24px;}
+    .section-light{background:#F9FAFB;padding:40px 24px;}
+    .section-dark{background:#0D1B2E;color:#fff;padding:40px 24px;}
+    .quote-block{border-left:4px solid #059669;padding:16px 20px;background:#F0FDF4;border-radius:0 12px 12px 0;margin:20px 0;}
+    .principle-row{display:flex;gap:16px;margin-bottom:24px;align-items:flex-start;}
+    .principle-icon{width:44px;height:44px;border-radius:14px;background:#ECFDF5;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:20px;}
   </style>
 </head>
-<body class="pb-24">
+<body style="padding-bottom:80px;">
 
 <!-- ============================================================
-  WORKOUT CONFIG
-  To add a new program: copy the object in PROGRAMS and fill it in.
-  Each exercise can have a `video` YouTube URL.
+  WORKOUT CONFIG — Phase 1 complete. Phase 2 content: add groups[] when ready.
+  Phase 2 unlock code: change PHASE2_CODE constant below.
 ============================================================ -->
 <script>
 const PROGRAMS = [
   {
     id:'comeback-strong',
     name:'Comeback Strong',
-    subtitle:'6 Week Strength & Reset',
-    schedule:'Weeks 1–3: Alternate W1 & W2  ·  Weeks 4–6: Alternate W3 & W4',
-    phaseUnlock: 6,
-    phaseTarget: 9,
+    subtitle:'12-Week Strength & Reset',
+    schedule:'Weeks 1–6: Phase 1  ·  Weeks 7–12: Phase 2',
     workouts:[
+      // ── Phase 1 ─────────────────────────────────────────────
       {
-        id:'w1',name:'Workout 1',phase:'Phase 1',
+        id:'w1',name:'Workout 1',phase:'Phase 1',weeks:'Weeks 1–3',
         groups:[
           {name:'Warm-Up',type:'warmup',exercises:[
             {name:'Spiderman Stretch',           sets:1,reps:'5 each side',         video:'https://youtu.be/JDEF9Sdx02Q'},
@@ -77,7 +82,7 @@ const PROGRAMS = [
         ]
       },
       {
-        id:'w2',name:'Workout 2',phase:'Phase 1',
+        id:'w2',name:'Workout 2',phase:'Phase 1',weeks:'Weeks 1–3',
         groups:[
           {name:'Warm-Up',type:'warmup',exercises:[
             {name:'Spiderman Stretch',           sets:1,reps:'5 breaths each side', video:'https://youtu.be/JDEF9Sdx02Q'},
@@ -92,8 +97,8 @@ const PROGRAMS = [
             {name:'Front Loaded Dumbbell Squat', sets:3,reps:'10–12', video:'https://youtube.com/shorts/wgz5KNPg_5g'},
           ]},
           {name:'Bi-Plex 2',type:'working',exercises:[
-            {name:'Single Arm Dumbbell Rows',            sets:3,reps:'10–12 each side', video:'https://youtube.com/shorts/kJp-xejA35E'},
-            {name:'Upper Back Supported Hip Thrust/Lift',sets:3,reps:'10–12',           video:'https://youtube.com/shorts/qEYOm8GFsvU'},
+            {name:'Single Arm Dumbbell Rows',             sets:3,reps:'10–12 each side', video:'https://youtube.com/shorts/kJp-xejA35E'},
+            {name:'Upper Back Supported Hip Thrust/Lift', sets:3,reps:'10–12',           video:'https://youtube.com/shorts/qEYOm8GFsvU'},
           ]},
           {name:'Tri-Plex 3',type:'working',exercises:[
             {name:'High Position Push-Up with Band',     sets:3,reps:'10–12', video:'https://youtu.be/_OuDmqxiTeY'},
@@ -106,7 +111,7 @@ const PROGRAMS = [
         ]
       },
       {
-        id:'w3',name:'Workout 3',phase:'Phase 2',
+        id:'w3',name:'Workout 3',phase:'Phase 1',weeks:'Weeks 4–6',
         groups:[
           {name:'Warm-Up',type:'warmup',exercises:[
             {name:'Spiderman Stretch',           sets:1,reps:'5 each side',         video:'https://youtu.be/JDEF9Sdx02Q'},
@@ -138,7 +143,7 @@ const PROGRAMS = [
         ]
       },
       {
-        id:'w4',name:'Workout 4',phase:'Phase 2',
+        id:'w4',name:'Workout 4',phase:'Phase 1',weeks:'Weeks 4–6',
         groups:[
           {name:'Warm-Up',type:'warmup',exercises:[
             {name:'Spiderman Stretch',           sets:1,reps:'5 breaths each side', video:'https://youtu.be/JDEF9Sdx02Q'},
@@ -157,7 +162,7 @@ const PROGRAMS = [
             {name:'Front Loaded Dumbbell Squat',sets:3,reps:'10–12', video:'https://youtu.be/wgz5KNPg_5g'},
           ]},
           {name:'Bi-Plex 3',type:'working',exercises:[
-            {name:'Seated Dumbbell Side Raises',sets:3,reps:'10–12',    video:'https://youtu.be/2cfOoB7y6R8'},
+            {name:'Seated Dumbbell Side Raises',sets:3,reps:'10–12',     video:'https://youtu.be/2cfOoB7y6R8'},
             {name:'Front Planks',               sets:3,reps:'30 seconds',video:'https://youtu.be/Dw2KDvubj_Q'},
           ]},
           {name:'Bi-Plex 4',type:'working',exercises:[
@@ -169,30 +174,39 @@ const PROGRAMS = [
           ]},
         ]
       },
+      // ── Phase 2 — add groups[] when MK provides workout content ─
+      {id:'w5',name:'Workout 5',phase:'Phase 2',weeks:'Weeks 7–9', comingSoon:true,groups:[]},
+      {id:'w6',name:'Workout 6',phase:'Phase 2',weeks:'Weeks 7–9', comingSoon:true,groups:[]},
+      {id:'w7',name:'Workout 7',phase:'Phase 2',weeks:'Weeks 10–12',comingSoon:true,groups:[]},
+      {id:'w8',name:'Workout 8',phase:'Phase 2',weeks:'Weeks 10–12',comingSoon:true,groups:[]},
     ]
   },
   // ← ADD NEW PROGRAMS HERE
 ];
 </script>
 
-
 <div id="app"></div>
 
 <!-- BOTTOM NAV -->
 <nav style="position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #E5E7EB;z-index:50;box-shadow:0 -2px 12px rgba(0,0,0,.08);">
   <div style="display:flex;justify-content:space-around;max-width:480px;margin:0 auto;">
-    <button id="nav-programs" class="nav-active" onclick="showView('programs')"
-      style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 24px;font-size:11px;font-weight:700;background:none;border:none;cursor:pointer;font-family:Inter,sans-serif;flex:1;">
+    <button id="nav-home" class="nav-active" onclick="showView('home')"
+      style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0;font-size:11px;font-weight:700;background:none;border:none;cursor:pointer;font-family:Inter,sans-serif;flex:1;">
+      <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+      Home
+    </button>
+    <button id="nav-programs" class="nav-off" onclick="showView('programs')"
+      style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0;font-size:11px;font-weight:700;background:none;border:none;cursor:pointer;font-family:Inter,sans-serif;flex:1;">
       <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
       Programs
     </button>
     <button id="nav-progress" class="nav-off" onclick="showView('progress')"
-      style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 24px;font-size:11px;font-weight:700;background:none;border:none;cursor:pointer;font-family:Inter,sans-serif;flex:1;">
+      style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0;font-size:11px;font-weight:700;background:none;border:none;cursor:pointer;font-family:Inter,sans-serif;flex:1;">
       <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
       Progress
     </button>
     <button id="nav-history" class="nav-off" onclick="showView('history')"
-      style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 24px;font-size:11px;font-weight:700;background:none;border:none;cursor:pointer;font-family:Inter,sans-serif;flex:1;">
+      style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0;font-size:11px;font-weight:700;background:none;border:none;cursor:pointer;font-family:Inter,sans-serif;flex:1;">
       <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
       History
     </button>
@@ -200,264 +214,444 @@ const PROGRAMS = [
 </nav>
 
 <script>
-// ── ACCESS CODE ────────────────────────────────────────────────
-var ACCESS_CODE = 'J4KX9M';
-function isUnlocked() {
-  return localStorage.getItem('cb_unlocked') === '1';
-}
-function unlock(code) {
-  if (code.trim().toUpperCase() === ACCESS_CODE) {
-    localStorage.setItem('cb_unlocked', '1');
-    return true;
-  }
-  return false;
-}
+// ── FIREBASE CONFIG ────────────────────────────────────────────
+const FB_CFG = {
+  apiKey: "AIzaSyCynk-RlZWs6RhtePLPjwULifvT6RY6ZG8",
+  authDomain: "comeback-strong.firebaseapp.com",
+  projectId: "comeback-strong",
+  storageBucket: "comeback-strong.firebasestorage.app",
+  messagingSenderId: "56190885384",
+  appId: "1:56190885384:web:96fe6787f6f7e8d6c5fbbd"
+};
+
+// ── ACCESS CODES ───────────────────────────────────────────────
+var PHASE1_CODE = 'J4KX9M';
+var PHASE2_CODE = 'STRONG7'; // ← Change this when Phase 2 is released
+var PHASE2_MIN_SESSIONS = 6;
 
 // ── STATE ──────────────────────────────────────────────────────
+var fbAuth, db;
+var uid = null;
+var authResolved = false;
+var cachedSessions = [];
+var userProfile = {};
+var pendingView = null;
+
 var appState = {
-  view: 'programs',
-  program: null,
+  view: 'loading',
+  program: PROGRAMS[0],
   workout: null,
   sessionId: null,
   progressExercise: null,
-  codeError: false,
+  codeError: null,
 };
 
-// ── STORAGE ────────────────────────────────────────────────────
-function getSessions() {
-  try { return JSON.parse(localStorage.getItem('cb_sessions') || '[]'); }
-  catch(e) { return []; }
+// ── PROFILE HELPERS ────────────────────────────────────────────
+function isUnlocked(phase) {
+  if (phase === 'phase1') return !!userProfile.phase1Unlocked;
+  if (phase === 'phase2') return !!userProfile.phase2Unlocked;
+  return false;
 }
-function saveSession(s) {
-  var all = getSessions();
-  all.unshift(s);
-  localStorage.setItem('cb_sessions', JSON.stringify(all));
+
+// ── SESSION STORAGE ────────────────────────────────────────────
+function getSessions() { return cachedSessions; }
+
+async function saveSessionData(s) {
+  cachedSessions.unshift(s);
+  if (db && uid) {
+    await db.collection('users').doc(uid).collection('sessions').doc(String(s.id)).set(s);
+  } else {
+    var all = JSON.parse(localStorage.getItem('cb_sessions') || '[]');
+    all.unshift(s);
+    localStorage.setItem('cb_sessions', JSON.stringify(all));
+  }
+}
+
+async function deleteSessionData(id) {
+  cachedSessions = cachedSessions.filter(function(s){ return s.id !== id; });
+  if (db && uid) {
+    await db.collection('users').doc(uid).collection('sessions').doc(String(id)).delete();
+  } else {
+    var all = JSON.parse(localStorage.getItem('cb_sessions') || '[]')
+      .filter(function(s){ return s.id !== id; });
+    localStorage.setItem('cb_sessions', JSON.stringify(all));
+  }
+}
+
+// ── CODE UNLOCK ────────────────────────────────────────────────
+async function unlockPhase(code) {
+  var c = code.trim().toUpperCase();
+  if (c === PHASE1_CODE) {
+    userProfile.phase1Unlocked = true;
+    if (db && uid) {
+      await db.collection('users').doc(uid).set({phase1Unlocked: true}, {merge: true});
+    } else {
+      localStorage.setItem('cb_phase1', '1');
+    }
+    return 'phase1';
+  }
+  if (c === PHASE2_CODE) {
+    var p1Count = cachedSessions.filter(function(s){ return s.phase === 'Phase 1'; }).length;
+    if (p1Count < PHASE2_MIN_SESSIONS) return 'phase2-locked';
+    userProfile.phase2Unlocked = true;
+    if (db && uid) {
+      await db.collection('users').doc(uid).set({phase2Unlocked: true}, {merge: true});
+    }
+    return 'phase2';
+  }
+  return null;
 }
 
 // ── VIDEO ──────────────────────────────────────────────────────
-function openVideo(name, url) {
-  window.open(url, '_blank');
-}
+function openVideo(name, url) { window.open(url, '_blank'); }
 
 // ── NAVIGATION ─────────────────────────────────────────────────
 function showView(v) {
-  // Progress and history require unlock
-  if ((v === 'progress' || v === 'history') && !isUnlocked()) {
-    appState.program = null;
-    appState.codeError = false;
+  if (v === 'home') {
+    appState.view = 'home';
+    updateNav('home');
+    render();
+    return;
+  }
+  if (v === 'auth') {
+    appState.view = 'auth';
+    render();
+    return;
+  }
+  // Protected views need auth
+  if (!uid) {
+    pendingView = v;
+    appState.view = 'auth';
+    render();
+    return;
+  }
+  // Protected views need code
+  if (!isUnlocked('phase1')) {
+    pendingView = v;
+    appState.codeError = null;
     appState.view = 'lock';
     render();
     return;
   }
   appState.view = v;
-  ['programs','progress','history'].forEach(function(id) {
+  updateNav(v);
+  render();
+}
+
+function updateNav(v) {
+  ['home','programs','progress','history'].forEach(function(id) {
     var el = document.getElementById('nav-' + id);
     if (!el) return;
     el.className = (id === v) ? 'nav-active' : 'nav-off';
   });
-  render();
 }
 
-// ── LOCK SCREEN ────────────────────────────────────────────────
-function viewLock() {
-  return '<div style="background:#F9FAFB;min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:40px 24px;text-align:center;">'
-    + '<div style="width:64px;height:64px;background:#ECFDF5;border-radius:20px;display:flex;align-items:center;justify-content:center;margin:0 auto 24px;">'
-    + '<svg width="28" height="28" fill="none" stroke="#059669" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>'
-    + '</div>'
-    + '<h2 style="font-family:Oswald,sans-serif;font-size:28px;font-weight:700;color:#111827;margin-bottom:8px;">Client Access Only</h2>'
-    + '<p style="color:#6B7280;font-size:14px;line-height:1.6;max-width:300px;margin:0 auto 32px;">This program is available to enrolled clients. Enter your access code to unlock.</p>'
-    + '<div style="width:100%;max-width:320px;">'
-    + '<input id="access-input" type="text" placeholder="Enter access code" style="width:100%;background:#fff;border:1px solid ' + (appState.codeError ? '#EF4444' : '#E5E7EB') + ';border-radius:12px;padding:14px 16px;font-size:16px;color:#111827;font-family:Inter,sans-serif;text-align:center;text-transform:uppercase;letter-spacing:.1em;outline:none;margin-bottom:12px;" />'
-    + (appState.codeError ? '<p style="color:#EF4444;font-size:13px;margin-bottom:12px;">Incorrect code. Please try again.</p>' : '')
-    + '<button id="access-submit" style="width:100%;background:#059669;color:#fff;font-family:Oswald,sans-serif;font-size:18px;font-weight:700;padding:14px;border-radius:12px;border:none;cursor:pointer;">Unlock Program</button>'
-    + '</div>'
-    + '<p style="color:#9CA3AF;font-size:12px;margin-top:28px;">Don\'t have a code? <a href="https://wa.me/97452086673" target="_blank" style="color:#059669;text-decoration:none;">Contact MK</a></p>'
-    + '<button onclick="showView(\'programs\')" style="background:none;border:none;color:#9CA3AF;font-size:13px;cursor:pointer;margin-top:16px;font-family:Inter,sans-serif;">← Back to Programs</button>'
-    + '</div>';
+// ── SIGN OUT ───────────────────────────────────────────────────
+function signOut() {
+  if (fbAuth) {
+    fbAuth.signOut().then(function() {
+      uid = null;
+      userProfile = {};
+      cachedSessions = [];
+      appState.view = 'home';
+      updateNav('home');
+      render();
+    });
+  }
 }
 
 // ── RENDER ─────────────────────────────────────────────────────
 function render() {
   var app = document.getElementById('app');
   var html = '';
-  if (appState.view === 'lock')       html = viewLock();
-  else if (appState.view === 'programs')  html = viewPrograms();
-  else if (appState.view === 'workouts')  html = viewWorkouts();
-  else if (appState.view === 'active')    html = viewActive();
-  else if (appState.view === 'history')   html = viewHistory();
-  else if (appState.view === 'detail')    html = viewDetail();
-  else if (appState.view === 'progress')  html = viewProgress();
+  var v = appState.view;
+  if      (v === 'loading')  html = viewLoading();
+  else if (v === 'auth')     html = viewAuth();
+  else if (v === 'lock')     html = viewLock();
+  else if (v === 'home')     html = viewHome();
+  else if (v === 'programs') html = viewPrograms();
+  else if (v === 'workouts') html = viewWorkouts();
+  else if (v === 'active')   html = viewActive();
+  else if (v === 'history')  html = viewHistory();
+  else if (v === 'detail')   html = viewDetail();
+  else if (v === 'progress') html = viewProgress();
   app.innerHTML = html;
   app.className = 'fade-in';
-  if (appState.view === 'progress') setTimeout(drawChart, 80);
+  void app.offsetWidth;
+  attachListeners();
+  if (v === 'progress') setTimeout(drawChart, 80);
+}
 
-  // Attach lock screen listeners after render
+function attachListeners() {
+  // Code entry
   var input  = document.getElementById('access-input');
   var submit = document.getElementById('access-submit');
-  if (submit) {
-    submit.addEventListener('click', function() {
-      var code = (input || {}).value || '';
-      if (unlock(code)) {
-        appState.codeError = false;
-        appState.view = 'workouts';
-        render();
-      } else {
-        appState.codeError = true;
-        render();
-      }
-    });
-  }
-  if (input) {
-    input.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') submit && submit.click();
-    });
-    // Auto-focus
+  if (submit && input) {
+    submit.addEventListener('click', handleCodeSubmit);
+    input.addEventListener('keydown', function(e){ if (e.key==='Enter') handleCodeSubmit(); });
     setTimeout(function(){ input.focus(); }, 80);
   }
+  // Google sign-in
+  var googleBtn = document.getElementById('google-signin');
+  if (googleBtn) {
+    googleBtn.addEventListener('click', function() {
+      var provider = new firebase.auth.GoogleAuthProvider();
+      fbAuth.signInWithPopup(provider).catch(function(e){ console.error(e); });
+    });
+  }
+}
+
+async function handleCodeSubmit() {
+  var input = document.getElementById('access-input');
+  var code = (input ? input.value : '') || '';
+  var result = await unlockPhase(code);
+  if (result === 'phase1' || result === 'phase2') {
+    appState.codeError = null;
+    var dest = pendingView || 'programs';
+    pendingView = null;
+    showView(dest);
+  } else if (result === 'phase2-locked') {
+    appState.codeError = 'need-sessions';
+    render();
+  } else {
+    appState.codeError = 'wrong';
+    render();
+  }
+}
+
+// ── BOOT ───────────────────────────────────────────────────────
+async function boot(user) {
+  uid = user ? user.uid : null;
+  if (db && uid) {
+    try {
+      var profileDoc = await db.collection('users').doc(uid).get();
+      userProfile = profileDoc.exists ? profileDoc.data() : {};
+    } catch(e) { userProfile = {}; }
+    try {
+      var snap = await db.collection('users').doc(uid).collection('sessions')
+        .orderBy('date', 'desc').get();
+      cachedSessions = snap.docs.map(function(d){ return d.data(); });
+    } catch(e) { cachedSessions = []; }
+  } else {
+    userProfile = { phase1Unlocked: localStorage.getItem('cb_phase1') === '1' };
+    cachedSessions = JSON.parse(localStorage.getItem('cb_sessions') || '[]');
+  }
+  authResolved = true;
+  appState.view = 'home';
+  updateNav('home');
+  render();
+}
+
+// ── FIREBASE INIT ──────────────────────────────────────────────
+firebase.initializeApp(FB_CFG);
+fbAuth = firebase.auth();
+db    = firebase.firestore();
+fbAuth.onAuthStateChanged(function(user) {
+  if (user) { boot(user); }
+  else      { authResolved = true; appState.view = 'home'; updateNav('home'); render(); }
+});
+
+// ══════════════════════════════════════════════════════════════
+// VIEW FUNCTIONS
+// ══════════════════════════════════════════════════════════════
+
+function viewLoading() {
+  return '<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#F9FAFB;">'
+    + '<div style="text-align:center;">'
+    + '<div style="width:44px;height:44px;border:3px solid #E5E7EB;border-top-color:#059669;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 14px;"></div>'
+    + '<p style="color:#9CA3AF;font-size:13px;font-family:Inter,sans-serif;">Loading...</p>'
+    + '</div></div>';
+}
+
+function viewAuth() {
+  return '<div style="min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:40px 24px;text-align:center;background:#F9FAFB;">'
+    + '<div style="width:64px;height:64px;background:#ECFDF5;border-radius:20px;display:flex;align-items:center;justify-content:center;margin:0 auto 24px;">'
+    + '<svg width="28" height="28" fill="none" stroke="#059669" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>'
+    + '</div>'
+    + '<h2 style="font-family:Oswald,sans-serif;font-size:28px;font-weight:700;color:#111827;margin-bottom:8px;">Sign In</h2>'
+    + '<p style="color:#6B7280;font-size:14px;line-height:1.6;max-width:280px;margin:0 auto 32px;">Sign in once to save your workouts across all your devices.</p>'
+    + '<button id="google-signin" style="display:flex;align-items:center;gap:12px;background:#fff;border:1px solid #E5E7EB;border-radius:12px;padding:14px 24px;font-size:15px;font-weight:600;color:#111827;cursor:pointer;font-family:Inter,sans-serif;box-shadow:0 1px 4px rgba(0,0,0,.08);">'
+    + '<svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>'
+    + 'Continue with Google'
+    + '</button>'
+    + '<button onclick="showView(\'home\')" style="background:none;border:none;color:#9CA3AF;font-size:13px;cursor:pointer;margin-top:20px;font-family:Inter,sans-serif;">← Back to home</button>'
+    + '</div>';
+}
+
+function viewLock() {
+  var p1Count = cachedSessions.filter(function(s){ return s.phase==='Phase 1'; }).length;
+  var errorMsg = '';
+  if (appState.codeError === 'wrong') {
+    errorMsg = '<p style="color:#EF4444;font-size:13px;margin-bottom:12px;">Incorrect code. Check with MK and try again.</p>';
+  } else if (appState.codeError === 'need-sessions') {
+    var needed = PHASE2_MIN_SESSIONS - p1Count;
+    errorMsg = '<p style="color:#F59E0B;font-size:13px;margin-bottom:12px;">Almost there! You need ' + needed + ' more Phase 1 session' + (needed!==1?'s':'') + ' to unlock Phase 2.</p>';
+  }
+  return '<div style="background:#F9FAFB;min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:40px 24px;text-align:center;">'
+    + '<div style="width:64px;height:64px;background:#ECFDF5;border-radius:20px;display:flex;align-items:center;justify-content:center;margin:0 auto 24px;">'
+    + '<svg width="28" height="28" fill="none" stroke="#059669" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>'
+    + '</div>'
+    + '<h2 style="font-family:Oswald,sans-serif;font-size:28px;font-weight:700;color:#111827;margin-bottom:8px;">Client Access Only</h2>'
+    + '<p style="color:#6B7280;font-size:14px;line-height:1.6;max-width:300px;margin:0 auto 32px;">Enter your program access code to unlock your workouts.</p>'
+    + '<div style="width:100%;max-width:320px;">'
+    + '<input id="access-input" type="text" placeholder="Enter access code" autocomplete="off" style="width:100%;background:#fff;border:1px solid '+(appState.codeError==='wrong'?'#EF4444':'#E5E7EB')+';border-radius:12px;padding:14px 16px;font-size:16px;color:#111827;font-family:Inter,sans-serif;text-align:center;text-transform:uppercase;letter-spacing:.12em;outline:none;margin-bottom:12px;" />'
+    + errorMsg
+    + '<button id="access-submit" style="width:100%;background:#059669;color:#fff;font-family:Oswald,sans-serif;font-size:18px;font-weight:700;padding:14px;border-radius:12px;border:none;cursor:pointer;">Unlock Program</button>'
+    + '</div>'
+    + '<p style="color:#9CA3AF;font-size:12px;margin-top:28px;">Don\'t have a code? <a href="https://wa.me/97452086673" target="_blank" style="color:#059669;text-decoration:none;">Contact MK</a></p>'
+    + '<button onclick="showView(\'home\')" style="background:none;border:none;color:#9CA3AF;font-size:13px;cursor:pointer;margin-top:16px;font-family:Inter,sans-serif;">← Back to home</button>'
+    + '</div>';
+}
+
+// ── HOME / PHILOSOPHY ──────────────────────────────────────────
+function viewHome() {
+  var ctaLabel = (uid && isUnlocked('phase1')) ? 'Open My Program →' : 'Enter Your Code →';
+
+  var principles = [
+    ['🏋️', 'Total-Body Training', 'Every session works your whole body. Three to four days a week of full-body training outperforms any split routine for women who want lasting results without spending hours in the gym.'],
+    ['🔁', 'Compound Movements', 'We choose exercises that move multiple joints at once — more value per rep, more muscle engaged, and more carry-over to real life.'],
+    ['⚖️', 'Unilateral Priority', 'Single-arm. Single-leg. These movements catch imbalances your body has built up over the years and fix them before they become injuries.'],
+    ['✅', 'Low Risk, High Reward', 'Every exercise earns its place. If the joint cost is too high, there is a better option. Training should build you up, not break you down.'],
+    ['🎯', 'Minimal Effective Dose', 'More is not better — the right amount is better. Two focused sessions a week beats six mediocre ones. Consistency is the goal, not exhaustion.'],
+  ];
+  var principleRows = principles.map(function(p) {
+    return '<div class="principle-row">'
+      + '<div class="principle-icon">' + p[0] + '</div>'
+      + '<div><p style="font-size:15px;font-weight:600;color:#0D1B2E;margin-bottom:4px;">' + p[1] + '</p>'
+      + '<p style="font-size:13px;color:#6B7280;line-height:1.6;">' + p[2] + '</p></div>'
+      + '</div>';
+  }).join('');
+
+  var structureRows = [
+    ['Phase 1', 'Weeks 1–6', 'Foundation', 'Weeks 1–3 alternate Workout 1 & 2 · Weeks 4–6 alternate Workout 3 & 4', '#ECFDF5', '#059669', 'pill-green'],
+    ['Phase 2', 'Weeks 7–12', 'Build', 'Weeks 7–9 alternate Workout 5 & 6 · Weeks 10–12 alternate Workout 7 & 8', '#FEF3C7', '#D97706', 'pill-orange'],
+  ].map(function(r) {
+    return '<div style="background:' + r[4] + ';border-radius:16px;padding:20px;margin-bottom:12px;">'
+      + '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">'
+      + '<div><p style="font-family:Oswald,sans-serif;font-size:20px;font-weight:700;color:#0D1B2E;">' + r[0] + '</p>'
+      + '<p style="font-size:12px;font-weight:600;color:' + r[5] + ';">' + r[1] + ' · ' + r[2] + '</p></div>'
+      + '</div>'
+      + '<p style="font-size:12px;color:#4B5563;line-height:1.5;">' + r[3] + '</p>'
+      + '</div>';
+  }).join('');
+
+  var signInRow = !uid
+    ? '<div style="background:#fff;border:1px solid #E5E7EB;border-radius:16px;padding:20px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;" onclick="showView(\'auth\')">'
+      + '<div><p style="font-size:14px;font-weight:600;color:#0D1B2E;">Sign in to track progress</p>'
+      + '<p style="font-size:12px;color:#9CA3AF;">Save workouts across all your devices</p></div>'
+      + '<svg width="18" height="18" fill="none" stroke="#CBD5E1" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>'
+      + '</div>'
+    : '<div style="background:#ECFDF5;border:1px solid #A7F3D0;border-radius:16px;padding:16px 20px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;">'
+      + '<p style="font-size:13px;color:#065F46;font-weight:600;">Signed in · data synced across devices</p>'
+      + '<button onclick="signOut()" style="font-size:12px;color:#6B7280;background:none;border:none;cursor:pointer;font-family:Inter,sans-serif;">Sign out</button>'
+      + '</div>';
+
+  return '<div style="background:#F9FAFB;min-height:100vh;padding-bottom:24px;">'
+
+    // Hero
+    + '<div class="hero">'
+    + '<div style="max-width:480px;margin:0 auto;">'
+    + '<p style="color:rgba(255,255,255,.55);font-size:11px;text-transform:uppercase;letter-spacing:.15em;margin-bottom:20px;">Fitbodies by MK</p>'
+    + '<h1 style="font-family:Oswald,sans-serif;font-size:52px;font-weight:700;color:#fff;line-height:1;margin-bottom:14px;">Comeback<br>Strong</h1>'
+    + '<p style="color:rgba(255,255,255,.75);font-size:16px;line-height:1.65;margin-bottom:36px;max-width:340px;">Your 12-week strength reset — built for real women, living real lives.</p>'
+    + '<button onclick="showView(\'programs\')" style="display:inline-block;background:#059669;color:#fff;font-family:Oswald,sans-serif;font-size:18px;font-weight:700;padding:16px 32px;border-radius:12px;border:none;cursor:pointer;box-shadow:0 4px 20px rgba(5,150,105,.4);">' + ctaLabel + '</button>'
+    + '</div></div>'
+
+    // Philosophy
+    + '<div class="section-white">'
+    + '<div style="max-width:480px;margin:0 auto;">'
+    + '<p style="color:#059669;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px;">The Philosophy</p>'
+    + '<h2 style="font-family:Oswald,sans-serif;font-size:30px;font-weight:700;color:#0D1B2E;margin-bottom:16px;">Simple. Not Easy.</h2>'
+    + '<p style="font-size:15px;color:#4B5563;line-height:1.7;margin-bottom:20px;">Training at 40+ looks different — and it should. The goal isn\'t to push harder. It\'s to train smarter. More intentional. Built to complement your life, not compete with it.</p>'
+    + '<div class="quote-block">'
+    + '<p style="font-size:15px;color:#065F46;line-height:1.6;font-style:italic;">"We\'re not in the fitness business. We\'re in the life-changing business."</p>'
+    + '<p style="font-size:12px;color:#6B7280;margin-top:8px;">— Mike Boyle, Mike Boyle Strength &amp; Conditioning</p>'
+    + '</div>'
+    + '<p style="font-size:15px;color:#4B5563;line-height:1.7;">Every workout in this program is purposeful. No fluff. No junk volume. Just the movements that give you the most return on your time — so you can be strong in the gym and even stronger outside it.</p>'
+    + '</div></div>'
+
+    // Principles
+    + '<div class="section-light">'
+    + '<div style="max-width:480px;margin:0 auto;">'
+    + '<p style="color:#059669;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px;">How We Train</p>'
+    + '<h2 style="font-family:Oswald,sans-serif;font-size:30px;font-weight:700;color:#0D1B2E;margin-bottom:24px;">Five Principles Behind Every Session</h2>'
+    + principleRows
+    + '</div></div>'
+
+    // Program Structure
+    + '<div class="section-white">'
+    + '<div style="max-width:480px;margin:0 auto;">'
+    + '<p style="color:#059669;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px;">The Structure</p>'
+    + '<h2 style="font-family:Oswald,sans-serif;font-size:30px;font-weight:700;color:#0D1B2E;margin-bottom:8px;">12 Weeks. Two Phases.</h2>'
+    + '<p style="font-size:14px;color:#6B7280;line-height:1.6;margin-bottom:24px;">Each phase builds on the last — supported to unsupported, unloaded to loaded, simple to complex. You earn Phase 2 by completing Phase 1.</p>'
+    + structureRows
+    + '<div style="background:#F9FAFB;border-radius:12px;padding:16px 20px;margin-top:8px;">'
+    + '<p style="font-size:13px;font-weight:600;color:#0D1B2E;margin-bottom:6px;">What to expect each session</p>'
+    + '<div style="display:flex;flex-wrap:wrap;gap:8px;">'
+    + '<span style="background:#E0F2FE;color:#0369A1;font-size:12px;font-weight:600;padding:4px 12px;border-radius:20px;">45–60 min</span>'
+    + '<span style="background:#E0F2FE;color:#0369A1;font-size:12px;font-weight:600;padding:4px 12px;border-radius:20px;">2–3×/week</span>'
+    + '<span style="background:#E0F2FE;color:#0369A1;font-size:12px;font-weight:600;padding:4px 12px;border-radius:20px;">Dumbbells + bench</span>'
+    + '<span style="background:#E0F2FE;color:#0369A1;font-size:12px;font-weight:600;padding:4px 12px;border-radius:20px;">Video for every move</span>'
+    + '</div></div>'
+    + '</div></div>'
+
+    // About MK
+    + '<div class="section-dark">'
+    + '<div style="max-width:480px;margin:0 auto;">'
+    + '<p style="color:rgba(255,255,255,.5);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px;">Your Coach</p>'
+    + '<h2 style="font-family:Oswald,sans-serif;font-size:30px;font-weight:700;color:#fff;margin-bottom:16px;">Built by MK</h2>'
+    + '<p style="font-size:15px;color:rgba(255,255,255,.75);line-height:1.7;margin-bottom:16px;">MK is a certified personal trainer and strength coach based in Doha, Qatar. She specialises in training women over 40 — helping them build genuine strength, move better, and feel confident in their bodies again.</p>'
+    + '<p style="font-size:15px;color:rgba(255,255,255,.75);line-height:1.7;margin-bottom:28px;">Comeback Strong is her signature 12-week program — built on proven strength training principles, designed around the life you\'re actually living.</p>'
+    + '<a href="https://wa.me/97452086673" target="_blank" style="display:inline-block;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;font-family:Oswald,sans-serif;font-size:16px;font-weight:600;padding:14px 28px;border-radius:12px;text-decoration:none;">Contact MK on WhatsApp →</a>'
+    + '</div></div>'
+
+    // CTA / Sign-in strip
+    + '<div class="section-light">'
+    + '<div style="max-width:480px;margin:0 auto;">'
+    + signInRow
+    + '<button onclick="showView(\'programs\')" style="width:100%;background:#059669;color:#fff;font-family:Oswald,sans-serif;font-size:20px;font-weight:700;padding:18px;border-radius:16px;border:none;cursor:pointer;box-shadow:0 4px 14px rgba(5,150,105,.25);">' + ctaLabel + '</button>'
+    + '</div></div>'
+
+    + '<p style="text-align:center;padding:16px 0 4px;font-size:11px;color:rgba(0,0,0,.18);">'
+    + '<a href="https://fitbodiesbymk-pixel.github.io/builtbymk/" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;">Built by BuiltByMK</a>'
+    + '</p>'
+    + '</div>';
 }
 
 // ── PROGRAMS ───────────────────────────────────────────────────
 function viewPrograms() {
-  var cards = PROGRAMS.map(function(p) {
-    var badges = p.workouts.map(function(w,i) {
-      var cls = i < 2 ? 'pill-green' : 'pill-orange';
-      return '<span class="pill ' + cls + '">' + w.name + '</span>';
-    }).join('');
-    return '<div onclick="selectProgram(\'' + p.id + '\')" class="card" style="cursor:pointer;border-left:4px solid #059669;">'
-      + '<div style="display:flex;justify-content:space-between;align-items:flex-start;">'
-      + '<div style="flex:1;">'
-      + '<h2 style="font-family:Oswald,sans-serif;font-size:22px;font-weight:700;color:#0D1B2E;margin-bottom:3px;">' + p.name + '</h2>'
-      + '<p style="color:#059669;font-size:13px;font-weight:600;margin-bottom:6px;">' + p.subtitle + '</p>'
-      + '<p style="color:#6B7280;font-size:11px;">' + p.schedule + '</p>'
-      + '</div>'
-      + '<svg width="20" height="20" fill="none" stroke="#CBD5E1" viewBox="0 0 24 24" style="flex-shrink:0;margin-top:2px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>'
-      + '</div>'
-      + '<div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:6px;">' + badges + '</div>'
-      + '</div>';
-  }).join('');
+  var p = appState.program;
+  var sessions = getSessions();
+  var p1Count = sessions.filter(function(s){ return s.phase==='Phase 1'; }).length;
+  var p2Unlocked = isUnlocked('phase2');
+  var pct = Math.min(100, Math.round((p1Count / PHASE2_MIN_SESSIONS) * 100));
 
   var howToItems = [
-    ['Select a program', 'Tap a program card below to see its workouts.'],
-    ['Start a session', 'Tap a workout to open it, then log your weight and reps for each working set.'],
-    ['Watch demo videos', 'Tap any exercise name (▶) to open the demo video in YouTube.'],
-    ['Save your session', 'Fill in your session notes at the bottom and tap <strong>Complete Workout</strong> to save.'],
-    ['Track progress', 'Use the <strong>Progress</strong> tab to see your best weight over time for any exercise.'],
-    ['Review history', 'The <strong>History</strong> tab shows every session you\'ve logged.'],
-    ['Phase unlock', 'Phase 2 unlocks automatically once you\'ve completed enough Phase 1 sessions — no skipping ahead.'],
+    ['Select a workout', 'Choose which workout to do based on where you are in the schedule.'],
+    ['Log your sets', 'Fill in weight and reps for each working set as you go.'],
+    ['Watch demos', 'Tap any exercise name (▶) to open the demo video in YouTube.'],
+    ['Complete &amp; save', 'Add session notes at the bottom and tap Complete Workout to save.'],
+    ['Track progress', 'The Progress tab shows your best weight over time for any exercise.'],
+    ['Review history', 'The History tab shows every session you\'ve logged.'],
   ];
   var howToRows = howToItems.map(function(item) {
     return '<div style="display:flex;gap:12px;margin-bottom:12px;">'
       + '<div style="width:6px;height:6px;border-radius:50%;background:#059669;flex-shrink:0;margin-top:5px;"></div>'
-      + '<div><p style="font-size:13px;font-weight:600;color:#0D1B2E;margin-bottom:1px;">' + item[0] + '</p>'
-      + '<p style="font-size:12px;color:#6B7280;">' + item[1] + '</p></div>'
+      + '<p style="font-size:13px;color:#4B5563;line-height:1.5;"><strong style="color:#0D1B2E;">' + item[0] + '</strong> — ' + item[1] + '</p>'
       + '</div>';
   }).join('');
 
-  var planNoteItems = [
-    ['Videos', 'Each movement includes a video demonstration. Tap the exercise name to view it. Watch all videos before your first session, then refer back as needed.'],
-    ['Reps', 'One full movement of an exercise. One push-up = one rep.'],
-    ['Sets', 'A group of reps done consecutively before resting. 3 sets of 10 means: do 10 reps, rest, repeat twice more.'],
-    ['Bi-Plex / Tri-Plex', 'Perform the listed exercises back-to-back without rest, then take the prescribed rest before repeating.'],
-    ['Choosing weights', 'Use a weight that challenges you in the given rep range. Can\'t reach the lower number? Go lighter. Can exceed the top easily? Go heavier.'],
-    ['Session notes', 'After each workout, complete your notes. Honest feedback helps adjust the plan if needed.'],
-  ];
-  var planNoteRows = planNoteItems.map(function(item) {
-    return '<div style="display:flex;gap:12px;margin-bottom:12px;">'
-      + '<div style="width:6px;height:6px;border-radius:50%;background:#F59E0B;flex-shrink:0;margin-top:5px;"></div>'
-      + '<div><p style="font-size:13px;font-weight:600;color:#0D1B2E;margin-bottom:1px;">' + item[0] + '</p>'
-      + '<p style="font-size:12px;color:#6B7280;">' + item[1] + '</p></div>'
-      + '</div>';
-  }).join('');
+  var p1Workouts = p.workouts.filter(function(w){ return w.phase==='Phase 1'; });
+  var p2Workouts = p.workouts.filter(function(w){ return w.phase==='Phase 2'; });
 
-  var infoCards = '<div class="card" style="padding:0;overflow:hidden;margin-bottom:14px;">'
-    + '<button onclick="var b=document.getElementById(\'how-body\');var a=document.getElementById(\'how-arrow\');var open=b.style.display!==\'none\';b.style.display=open?\'none\':\'block\';a.style.transform=open?\'rotate(0deg)\':\'rotate(180deg)\';" style="width:100%;display:flex;justify-content:space-between;align-items:center;padding:16px 20px;background:none;border:none;cursor:pointer;font-family:Inter,sans-serif;">'
-    + '<div style="display:flex;align-items:center;gap:10px;">'
-    + '<svg width="18" height="18" fill="none" stroke="#059669" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>'
-    + '<span style="font-family:Oswald,sans-serif;font-size:16px;font-weight:600;color:#0D1B2E;">How to use this app</span>'
-    + '</div>'
-    + '<svg id="how-arrow" width="16" height="16" fill="none" stroke="#9CA3AF" viewBox="0 0 24 24" style="transition:transform .2s;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>'
-    + '</button>'
-    + '<div id="how-body" style="display:none;padding:4px 20px 20px;">'
-    + howToRows
-    + '</div></div>'
-
-    + '<div class="card" style="padding:0;overflow:hidden;margin-bottom:14px;">'
-    + '<button onclick="var b=document.getElementById(\'plan-body\');var a=document.getElementById(\'plan-arrow\');var open=b.style.display!==\'none\';b.style.display=open?\'none\':\'block\';a.style.transform=open?\'rotate(0deg)\':\'rotate(180deg)\';" style="width:100%;display:flex;justify-content:space-between;align-items:center;padding:16px 20px;background:none;border:none;cursor:pointer;font-family:Inter,sans-serif;">'
-    + '<div style="display:flex;align-items:center;gap:10px;">'
-    + '<svg width="18" height="18" fill="none" stroke="#F59E0B" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>'
-    + '<span style="font-family:Oswald,sans-serif;font-size:16px;font-weight:600;color:#0D1B2E;">Plan Notes</span>'
-    + '</div>'
-    + '<svg id="plan-arrow" width="16" height="16" fill="none" stroke="#9CA3AF" viewBox="0 0 24 24" style="transition:transform .2s;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>'
-    + '</button>'
-    + '<div id="plan-body" style="display:none;padding:4px 20px 20px;">'
-    + planNoteRows
-    + '</div></div>';
-
-  return '<div style="background:#F9FAFB;min-height:100vh;padding-bottom:80px;">'
-    + '<div style="padding:40px 16px 24px;max-width:480px;margin:0 auto;">'
-    + '<p style="color:rgba(0,0,0,.4);font-family:Oswald,sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.12em;margin-bottom:4px;">Fitbodies by MK</p>'
-    + '<h1 style="font-family:Oswald,sans-serif;font-size:34px;font-weight:700;color:#111827;margin-bottom:4px;">Programs</h1>'
-    + '<p style="color:rgba(0,0,0,.5);font-size:13px;margin-bottom:24px;">Select a program to get started.</p>'
-    + '</div>'
-    + '<div style="background:#F9FAFB;min-height:70vh;padding:8px 16px 0;max-width:480px;margin:0 auto;">'
-    + infoCards
-    + cards
-    + '<p style="text-align:center;color:#9CA3AF;font-size:11px;margin-top:16px;">Data saved on this device &nbsp;·&nbsp; <span style="color:#059669;cursor:pointer;" onclick="if(confirm(\'Clear all history?\')){localStorage.removeItem(\'cb_sessions\');render();}">Clear history</span></p>'
-    + '</div></div>';
-}
-
-function selectProgram(id) {
-  appState.program = PROGRAMS.find(function(p){ return p.id === id; });
-  appState.codeError = false;
-  appState.view = isUnlocked() ? 'workouts' : 'lock';
-  render();
-}
-
-// ── WORKOUTS ───────────────────────────────────────────────────
-function viewWorkouts() {
-  var p = appState.program;
-  var sessions = getSessions();
-  var phase1Count = sessions.filter(function(s){ return s.program===p.name && s.phase==='Phase 1'; }).length;
-  var required = p.phaseUnlock || 6;
-  var target = p.phaseTarget || required;
-  var phase2Unlocked = phase1Count >= required;
-
-  var cards = p.workouts.map(function(w) {
+  var p1Cards = p1Workouts.map(function(w) {
     var count = w.groups.filter(function(g){ return g.type==='working'; })
       .reduce(function(a,g){ return a+g.exercises.length; }, 0);
     var logged = sessions.filter(function(s){ return s.workout===w.name && s.program===p.name; }).length;
-    var isP2 = w.phase === 'Phase 2';
-    var pillCls = isP2 ? 'pill-orange' : 'pill-green';
-    var borderColor = isP2 ? '#F59E0B' : '#10B981';
-
-    if (isP2 && !phase2Unlocked) {
-      var pct = Math.min(100, Math.round((phase1Count / target) * 100));
-      var remaining = required - phase1Count;
-      return '<div class="card" style="opacity:.65;border-left:4px solid #D1D5DB;cursor:default;">'
-        + '<div style="display:flex;justify-content:space-between;align-items:flex-start;">'
-        + '<div style="flex:1;">'
-        + '<span class="pill" style="background:#F3F4F6;color:#9CA3AF;margin-bottom:6px;display:inline-block;">' + w.phase + '</span>'
-        + '<h3 style="font-family:Oswald,sans-serif;font-size:20px;font-weight:700;color:#6B7280;">' + w.name + '</h3>'
-        + '<p style="color:#9CA3AF;font-size:11px;margin-top:2px;">' + count + ' exercises</p>'
-        + '</div>'
-        + '<svg width="20" height="20" fill="none" stroke="#9CA3AF" viewBox="0 0 24 24" style="flex-shrink:0;margin-top:2px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>'
-        + '</div>'
-        + '<div style="margin-top:14px;">'
-        + '<div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:6px;">'
-        + '<span style="color:#6B7280;font-weight:500;">' + remaining + ' more Phase 1 session' + (remaining!==1?'s':'') + ' to unlock</span>'
-        + '<span style="color:#9CA3AF;">' + phase1Count + ' / ' + target + '</span>'
-        + '</div>'
-        + '<div style="background:#E5E7EB;border-radius:99px;height:6px;">'
-        + '<div style="background:linear-gradient(90deg,#10B981,#34D399);height:6px;border-radius:99px;width:' + pct + '%;"></div>'
-        + '</div>'
-        + '<p style="font-size:10px;color:#9CA3AF;margin-top:6px;">Unlocks at ' + required + ' sessions · aim for ' + target + ' (3 per week)</p>'
-        + '</div></div>';
-    }
-
-    return '<div onclick="selectWorkout(\'' + w.id + '\')" class="card" style="cursor:pointer;border-left:4px solid ' + borderColor + ';">'
+    return '<div onclick="selectWorkout(\'' + w.id + '\')" class="card" style="cursor:pointer;border-left:4px solid #10B981;">'
       + '<div style="display:flex;justify-content:space-between;align-items:center;">'
       + '<div>'
-      + '<span class="pill ' + pillCls + '" style="margin-bottom:6px;display:inline-block;">' + w.phase + '</span>'
+      + '<span class="pill pill-green" style="margin-bottom:6px;display:inline-block;">' + w.weeks + '</span>'
       + '<h3 style="font-family:Oswald,sans-serif;font-size:20px;font-weight:700;color:#0D1B2E;">' + w.name + '</h3>'
       + '<p style="color:#9CA3AF;font-size:11px;margin-top:2px;">' + count + ' exercises &nbsp;·&nbsp; ' + logged + ' session' + (logged!==1?'s':'') + ' logged</p>'
       + '</div>'
@@ -465,18 +659,116 @@ function viewWorkouts() {
       + '</div></div>';
   }).join('');
 
+  var p2Cards = '';
+  if (!p2Unlocked) {
+    // Locked Phase 2 cards with progress
+    p2Cards = p2Workouts.map(function(w) {
+      var remaining = Math.max(0, PHASE2_MIN_SESSIONS - p1Count);
+      return '<div class="card" style="opacity:.6;border-left:4px solid #D1D5DB;cursor:default;">'
+        + '<div style="display:flex;justify-content:space-between;align-items:flex-start;">'
+        + '<div style="flex:1;">'
+        + '<span class="pill" style="background:#F3F4F6;color:#9CA3AF;margin-bottom:6px;display:inline-block;">' + w.weeks + '</span>'
+        + '<h3 style="font-family:Oswald,sans-serif;font-size:20px;font-weight:700;color:#6B7280;">' + w.name + '</h3>'
+        + (w.comingSoon ? '<p style="color:#9CA3AF;font-size:11px;margin-top:2px;">Content coming soon</p>' : '')
+        + '</div>'
+        + '<svg width="20" height="20" fill="none" stroke="#9CA3AF" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>'
+        + '</div></div>';
+    }).join('');
+
+    // Phase 2 unlock progress bar (only if p2 workouts exist)
+    if (p2Workouts.length) {
+      p2Cards = '<div style="background:#FFF7ED;border:1px solid #FDE68A;border-radius:16px;padding:16px 20px;margin-bottom:14px;">'
+        + '<p style="font-size:13px;font-weight:600;color:#92400E;margin-bottom:4px;">Phase 2 — Locked</p>'
+        + '<p style="font-size:12px;color:#B45309;margin-bottom:10px;">'
+        + (p1Count >= PHASE2_MIN_SESSIONS
+            ? 'You\'ve completed Phase 1! Enter your Phase 2 code to unlock.'
+            : 'Complete ' + (PHASE2_MIN_SESSIONS - p1Count) + ' more Phase 1 session' + ((PHASE2_MIN_SESSIONS - p1Count)!==1?'s':'') + ', then use your Phase 2 access code.')
+        + '</p>'
+        + '<div style="background:#FDE68A;border-radius:99px;height:6px;margin-bottom:8px;">'
+        + '<div style="background:linear-gradient(90deg,#F59E0B,#FBBF24);height:6px;border-radius:99px;width:' + pct + '%;transition:width .4s;"></div>'
+        + '</div>'
+        + '<div style="display:flex;justify-content:space-between;font-size:11px;color:#B45309;">'
+        + '<span>' + p1Count + ' Phase 1 sessions</span><span>Goal: ' + PHASE2_MIN_SESSIONS + '</span>'
+        + '</div>'
+        + (p1Count >= PHASE2_MIN_SESSIONS
+            ? '<button onclick="appState.codeError=null;pendingView=\'programs\';appState.view=\'lock\';render();" style="width:100%;background:#F59E0B;color:#fff;font-family:Oswald,sans-serif;font-size:16px;font-weight:700;padding:12px;border-radius:10px;border:none;cursor:pointer;margin-top:12px;">Enter Phase 2 Code</button>'
+            : '')
+        + '</div>'
+        + p2Cards;
+    }
+  } else {
+    // Phase 2 unlocked
+    p2Cards = p2Workouts.map(function(w) {
+      if (w.comingSoon) {
+        return '<div class="card" style="opacity:.7;border-left:4px solid #F59E0B;cursor:default;">'
+          + '<div style="display:flex;justify-content:space-between;align-items:center;">'
+          + '<div>'
+          + '<span class="pill pill-orange" style="margin-bottom:6px;display:inline-block;">' + w.weeks + '</span>'
+          + '<h3 style="font-family:Oswald,sans-serif;font-size:20px;font-weight:700;color:#0D1B2E;">' + w.name + '</h3>'
+          + '<p style="color:#9CA3AF;font-size:11px;margin-top:2px;">Content coming soon</p>'
+          + '</div>'
+          + '<svg width="18" height="18" fill="none" stroke="#FDE68A" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>'
+          + '</div></div>';
+      }
+      var count = w.groups.filter(function(g){ return g.type==='working'; })
+        .reduce(function(a,g){ return a+g.exercises.length; }, 0);
+      var logged = getSessions().filter(function(s){ return s.workout===w.name && s.program===p.name; }).length;
+      return '<div onclick="selectWorkout(\'' + w.id + '\')" class="card" style="cursor:pointer;border-left:4px solid #F59E0B;">'
+        + '<div style="display:flex;justify-content:space-between;align-items:center;">'
+        + '<div>'
+        + '<span class="pill pill-orange" style="margin-bottom:6px;display:inline-block;">' + w.weeks + '</span>'
+        + '<h3 style="font-family:Oswald,sans-serif;font-size:20px;font-weight:700;color:#0D1B2E;">' + w.name + '</h3>'
+        + '<p style="color:#9CA3AF;font-size:11px;margin-top:2px;">' + count + ' exercises &nbsp;·&nbsp; ' + logged + ' session' + (logged!==1?'s':'') + ' logged</p>'
+        + '</div>'
+        + '<svg width="18" height="18" fill="none" stroke="#CBD5E1" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>'
+        + '</div></div>';
+    }).join('');
+  }
+
+  var accordion = '<div class="card" style="padding:0;overflow:hidden;margin-bottom:14px;">'
+    + '<button onclick="var b=document.getElementById(\'how-body\');var a=document.getElementById(\'how-arrow\');var o=b.style.display!==\'none\';b.style.display=o?\'none\':\'block\';a.style.transform=o?\'rotate(0deg)\':\'rotate(180deg)\';" style="width:100%;display:flex;justify-content:space-between;align-items:center;padding:16px 20px;background:none;border:none;cursor:pointer;font-family:Inter,sans-serif;">'
+    + '<div style="display:flex;align-items:center;gap:10px;">'
+    + '<svg width="18" height="18" fill="none" stroke="#059669" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>'
+    + '<span style="font-family:Oswald,sans-serif;font-size:16px;font-weight:600;color:#0D1B2E;">How to use this app</span>'
+    + '</div>'
+    + '<svg id="how-arrow" width="16" height="16" fill="none" stroke="#9CA3AF" viewBox="0 0 24 24" style="transition:transform .2s;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>'
+    + '</button>'
+    + '<div id="how-body" style="display:none;padding:4px 20px 20px;">' + howToRows + '</div></div>';
+
   return '<div style="background:#F9FAFB;min-height:100vh;padding-bottom:80px;">'
     + '<div style="padding:40px 16px 24px;max-width:480px;margin:0 auto;">'
-    + '<button onclick="showView(\'programs\')" class="back-btn"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>Programs</button>'
+    + '<p style="color:rgba(0,0,0,.4);font-family:Oswald,sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.12em;margin-bottom:4px;">Fitbodies by MK</p>'
     + '<h1 style="font-family:Oswald,sans-serif;font-size:34px;font-weight:700;color:#111827;margin-bottom:4px;">' + p.name + '</h1>'
-    + '<p style="color:rgba(0,0,0,.5);font-size:13px;">' + p.schedule + '</p>'
+    + '<p style="color:rgba(0,0,0,.5);font-size:13px;margin-bottom:24px;">' + p.schedule + '</p>'
     + '</div>'
-    + '<div style="background:#F9FAFB;min-height:70vh;padding:8px 16px 0;max-width:480px;margin:0 auto;">'
-    + cards + '</div></div>';
+    + '<div style="padding:0 16px;max-width:480px;margin:0 auto;">'
+    + accordion
+    // Phase 1 section
+    + '<p style="font-family:Oswald,sans-serif;font-size:13px;font-weight:600;color:#059669;text-transform:uppercase;letter-spacing:.08em;margin:16px 0 10px;">Phase 1 — Weeks 1–6</p>'
+    + p1Cards
+    // Phase 2 section
+    + (p2Workouts.length ? '<p style="font-family:Oswald,sans-serif;font-size:13px;font-weight:600;color:#D97706;text-transform:uppercase;letter-spacing:.08em;margin:16px 0 10px;">Phase 2 — Weeks 7–12</p>' + p2Cards : '')
+    + '<p style="text-align:center;color:#9CA3AF;font-size:11px;margin-top:16px;">'
+    + (uid ? 'Data synced to your account' : 'Data saved on this device')
+    + ' &nbsp;·&nbsp; <span style="color:#EF4444;cursor:pointer;" onclick="if(confirm(\'Clear all history? This cannot be undone.\')){clearAllSessions();}">Clear history</span></p>'
+    + '</div></div>';
+}
+
+function clearAllSessions() {
+  cachedSessions = [];
+  if (db && uid) {
+    // No bulk delete in Firestore without a batch — just clear local cache for now
+    localStorage.removeItem('cb_sessions');
+  } else {
+    localStorage.removeItem('cb_sessions');
+  }
+  render();
 }
 
 function selectWorkout(id) {
-  appState.workout = appState.program.workouts.find(function(w){ return w.id===id; });
+  var w = appState.program.workouts.find(function(w){ return w.id===id; });
+  if (!w || w.comingSoon) return;
+  appState.workout = w;
   appState.view = 'active';
   render();
 }
@@ -487,13 +779,13 @@ function viewActive() {
   var p = appState.program;
   var today = new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
   var lastSess = getSessions().find(function(s){ return s.workout===w.name && s.program===p.name; });
-
   var isP2 = w.phase === 'Phase 2';
   var headerBorder = isP2 ? '4px solid #F59E0B' : '4px solid #059669';
+
   var html = '<div style="background:#F9FAFB;min-height:100vh;padding-bottom:80px;">'
     + '<div style="background:#fff;border-bottom:' + headerBorder + ';padding:28px 16px 20px;max-width:480px;margin:0 auto;">'
-    + '<button onclick="appState.view=\'workouts\';render();" class="back-btn"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>Back</button>'
-    + '<p style="color:rgba(0,0,0,.45);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">' + p.name + ' · ' + w.phase + '</p>'
+    + '<button onclick="appState.view=\'programs\';render();" class="back-btn"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>Back</button>'
+    + '<p style="color:rgba(0,0,0,.45);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">' + p.name + ' · ' + w.phase + ' · ' + w.weeks + '</p>'
     + '<h1 style="font-family:Oswald,sans-serif;font-size:34px;font-weight:700;color:#111827;margin-bottom:2px;">' + w.name + '</h1>'
     + '<p style="color:rgba(0,0,0,.5);font-size:13px;">' + today + '</p>'
     + '</div>'
@@ -520,7 +812,6 @@ function viewActive() {
     } else if (group.type === 'working') {
       html += '<div style="background:#fff;border-radius:16px;padding:20px;margin-bottom:16px;border:1px solid #E5E7EB;">'
         + '<h3 style="font-family:Oswald,sans-serif;font-size:12px;color:#059669;text-transform:uppercase;letter-spacing:.1em;margin-bottom:16px;">' + group.name + '</h3>';
-
       group.exercises.forEach(function(ex, ei) {
         var key = group.name.replace(/\s/g,'') + '-' + ei;
         var safeN = ex.name.replace(/'/g,'&#39;');
@@ -531,21 +822,17 @@ function viewActive() {
             .map(function(s,i){ return 'S'+(i+1)+': '+(s.weight||'?')+'kg×'+(s.reps||'?'); });
           if (parts.length) lastHint = '<p style="color:#9CA3AF;font-size:11px;margin-bottom:8px;">Last: ' + parts.join(' · ') + '</p>';
         }
-
         if (ei > 0) html += '<div style="border-top:1px solid #F3F4F6;margin:16px 0;"></div>';
-
         html += '<div style="margin-bottom:4px;">'
           + '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2px;">'
           + '<button onclick="openVideo(\'' + safeN + '\',\'' + ex.video + '\')" style="color:#0D1B2E;font-size:13px;font-weight:600;text-align:left;background:none;border:none;cursor:pointer;font-family:Inter,sans-serif;">' + ex.name + ' <span style="color:#059669;font-size:11px;">▶</span></button>'
           + '<span style="color:#9CA3AF;font-size:11px;margin-left:8px;white-space:nowrap;">' + ex.sets + ' × ' + ex.reps + '</span>'
-          + '</div>'
-          + lastHint
+          + '</div>' + lastHint
           + '<div style="display:grid;grid-template-columns:32px 1fr 1fr;gap:4px;margin-bottom:4px;padding:0 4px;">'
           + '<span style="font-size:10px;color:#9CA3AF;">SET</span>'
           + '<span style="font-size:10px;color:#9CA3AF;text-align:center;">WEIGHT (kg)</span>'
           + '<span style="font-size:10px;color:#9CA3AF;text-align:center;">REPS</span>'
           + '</div>';
-
         for (var si = 0; si < ex.sets; si++) {
           html += '<div style="display:grid;grid-template-columns:32px 1fr 1fr;gap:4px;margin-bottom:6px;align-items:center;">'
             + '<span style="font-size:11px;color:#6B7280;font-weight:500;padding-left:4px;">' + (si+1) + '</span>'
@@ -582,7 +869,7 @@ function viewActive() {
   return html;
 }
 
-function completeWorkout() {
+async function completeWorkout() {
   var w = appState.workout;
   var exercises = [];
   w.groups.forEach(function(group) {
@@ -596,10 +883,10 @@ function completeWorkout() {
           reps:   (document.getElementById('r-' + key + '-' + si)||{}).value || '',
         });
       }
-      exercises.push({group:group.name, name:ex.name, prescribed:ex.sets+' × '+ex.reps, sets:sets});
+      exercises.push({group:group.name, name:ex.name, prescribed:ex.sets+'×'+ex.reps, sets:sets});
     });
   });
-  saveSession({
+  var s = {
     id: Date.now(),
     date: new Date().toISOString(),
     program: appState.program.name,
@@ -607,7 +894,10 @@ function completeWorkout() {
     phase: w.phase,
     exercises: exercises,
     notes: (document.getElementById('session-notes')||{}).value || '',
-  });
+  };
+  var btn = document.querySelector('button[onclick="completeWorkout()"]');
+  if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
+  await saveSessionData(s);
   showView('history');
 }
 
@@ -615,7 +905,6 @@ function completeWorkout() {
 function viewHistory() {
   var sessions = getSessions();
   var cards = '';
-
   if (!sessions.length) {
     cards = '<div style="text-align:center;padding:80px 0;color:#9CA3AF;">'
       + '<svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin:0 auto 16px;opacity:.3;display:block;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>'
@@ -627,9 +916,9 @@ function viewHistory() {
       var dateStr = d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
       var timeStr = d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
       var isP2 = s.phase === 'Phase 2';
-      var pillCls = isP2 ? 'pill-orange' : 'pill-green';
       var borderColor = isP2 ? '#F59E0B' : '#10B981';
-      cards += '<div onclick="viewDetail(' + s.id + ')" class="card" style="cursor:pointer;border-left:4px solid ' + borderColor + ';">'
+      var pillCls = isP2 ? 'pill-orange' : 'pill-green';
+      cards += '<div onclick="viewDetail_go(' + s.id + ')" class="card" style="cursor:pointer;border-left:4px solid ' + borderColor + ';">'
         + '<div style="display:flex;justify-content:space-between;align-items:flex-start;">'
         + '<div>'
         + '<span class="pill ' + pillCls + '" style="margin-bottom:6px;display:inline-block;">' + s.program + ' · ' + s.phase + '</span>'
@@ -642,15 +931,18 @@ function viewHistory() {
         + '</div>';
     });
   }
-
   return '<div style="background:#F9FAFB;min-height:100vh;padding-bottom:80px;">'
     + '<div style="padding:40px 16px 24px;max-width:480px;margin:0 auto;">'
     + '<h1 style="font-family:Oswald,sans-serif;font-size:34px;font-weight:700;color:#111827;margin-bottom:4px;">History</h1>'
     + '<p style="color:rgba(0,0,0,.5);font-size:13px;">' + sessions.length + ' session' + (sessions.length!==1?'s':'') + ' logged</p>'
     + '</div>'
-    + '<div style="background:#F9FAFB;min-height:70vh;padding:8px 16px 0;max-width:480px;margin:0 auto;">'
-    + cards
-    + '</div></div>';
+    + '<div style="padding:0 16px;max-width:480px;margin:0 auto;">' + cards + '</div></div>';
+}
+
+function viewDetail_go(id) {
+  appState.sessionId = id;
+  appState.view = 'detail';
+  render();
 }
 
 function viewDetail() {
@@ -668,8 +960,7 @@ function viewDetail() {
   s.exercises.forEach(function(ex) {
     if (ex.group !== currentGroup) {
       if (currentGroup) exHtml += '</div>';
-      exHtml += '<div class="card">'
-        + '<h3 style="font-family:Oswald,sans-serif;font-size:12px;color:#059669;text-transform:uppercase;letter-spacing:.1em;margin-bottom:16px;">' + ex.group + '</h3>';
+      exHtml += '<div class="card"><h3 style="font-family:Oswald,sans-serif;font-size:12px;color:#059669;text-transform:uppercase;letter-spacing:.1em;margin-bottom:16px;">' + ex.group + '</h3>';
       currentGroup = ex.group;
     }
     var hasData = ex.sets.some(function(st){ return st.weight||st.reps; });
@@ -679,25 +970,21 @@ function viewDetail() {
       + '<span style="font-size:11px;color:#9CA3AF;">' + ex.prescribed + '</span>'
       + '</div>'
       + (hasData
-        ? ex.sets.map(function(set,i){ return (set.weight||set.reps)
-            ? '<div style="display:flex;align-items:center;gap:10px;font-size:13px;margin-bottom:3px;">'
-              + '<span style="font-size:11px;color:#9CA3AF;width:36px;">Set ' + (i+1) + '</span>'
-              + '<span style="font-weight:600;color:#0D1B2E;">' + (set.weight?set.weight+' kg':'—') + '</span>'
-              + '<span style="color:#D1D5DB;">×</span>'
-              + '<span style="font-weight:600;color:#0D1B2E;">' + (set.reps?set.reps+' reps':'—') + '</span>'
-              + '</div>' : '';
-          }).join('')
-        : '<p style="font-size:11px;color:#9CA3AF;font-style:italic;">No data recorded</p>')
+          ? ex.sets.map(function(set,i){ return (set.weight||set.reps)
+              ? '<div style="display:flex;align-items:center;gap:10px;font-size:13px;margin-bottom:3px;">'
+                + '<span style="font-size:11px;color:#9CA3AF;width:36px;">Set ' + (i+1) + '</span>'
+                + '<span style="font-weight:600;color:#0D1B2E;">' + (set.weight?set.weight+' kg':'—') + '</span>'
+                + '<span style="color:#D1D5DB;">×</span>'
+                + '<span style="font-weight:600;color:#0D1B2E;">' + (set.reps?set.reps+' reps':'—') + '</span>'
+                + '</div>' : ''; }).join('')
+          : '<p style="font-size:11px;color:#9CA3AF;font-style:italic;">No data recorded</p>')
       + '</div>';
   });
   if (currentGroup) exHtml += '</div>';
-
   if (s.notes) {
-    exHtml += '<div class="card">'
-      + '<h3 style="font-family:Oswald,sans-serif;font-size:12px;color:#059669;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;">Notes</h3>'
+    exHtml += '<div class="card"><h3 style="font-family:Oswald,sans-serif;font-size:12px;color:#059669;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;">Notes</h3>'
       + '<p style="font-size:13px;color:#4B5563;">' + s.notes + '</p></div>';
   }
-
   exHtml += '<button onclick="deleteSession(' + s.id + ')" style="width:100%;border:1px solid #FCA5A5;color:#EF4444;font-size:13px;font-weight:600;padding:12px;border-radius:16px;background:none;cursor:pointer;font-family:Inter,sans-serif;margin-bottom:8px;">Delete Session</button>';
 
   return '<div style="background:#F9FAFB;min-height:100vh;padding-bottom:80px;">'
@@ -707,23 +994,12 @@ function viewDetail() {
     + '<h1 style="font-family:Oswald,sans-serif;font-size:34px;font-weight:700;color:#111827;margin-bottom:2px;">' + s.workout + '</h1>'
     + '<p style="color:rgba(0,0,0,.5);font-size:13px;">' + dateStr + '</p>'
     + '</div>'
-    + '<div style="background:#F9FAFB;min-height:70vh;padding:8px 16px 0;max-width:480px;margin:0 auto;">'
-    + exHtml
-    + '</div></div>';
+    + '<div style="padding:8px 16px 0;max-width:480px;margin:0 auto;">' + exHtml + '</div></div>';
 }
-
-function viewDetail_go(id) {
-  appState.sessionId = id;
-  appState.view = 'detail';
-  render();
-}
-function viewDetail(id) { viewDetail_go(id); }
 
 function deleteSession(id) {
   if (!confirm('Delete this session?')) return;
-  var all = getSessions().filter(function(s){ return s.id !== id; });
-  localStorage.setItem('cb_sessions', JSON.stringify(all));
-  showView('history');
+  deleteSessionData(id).then(function(){ showView('history'); });
 }
 
 // ── PROGRESS ───────────────────────────────────────────────────
@@ -738,18 +1014,14 @@ function viewProgress() {
     + '</div>';
 
   if (!allEx.length) {
-    return '<div style="background:#F9FAFB;min-height:100vh;padding-bottom:80px;">'
-      + header
-      + '<div style="background:#F9FAFB;min-height:70vh;padding:8px 16px 0;max-width:480px;margin:0 auto;">'
-      + '<div style="text-align:center;padding:80px 0;color:#9CA3AF;">'
+    return '<div style="background:#F9FAFB;min-height:100vh;padding-bottom:80px;">' + header
+      + '<div style="padding:0 16px;max-width:480px;margin:0 auto;text-align:center;padding-top:80px;color:#9CA3AF;">'
       + '<svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin:0 auto 16px;opacity:.3;display:block;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>'
-      + '<p style="font-weight:600;">No data yet.</p><p style="font-size:13px;margin-top:4px;">Log a few sessions to track your progress.</p></div>'
-      + '</div></div>';
+      + '<p style="font-weight:600;">No data yet.</p><p style="font-size:13px;margin-top:4px;">Log a few sessions to track your progress.</p></div></div>';
   }
 
   if (!appState.progressExercise) appState.progressExercise = allEx[0];
   var sel = appState.progressExercise;
-
   var exData = sessions
     .filter(function(s){ return s.exercises.some(function(e){ return e.name===sel; }); })
     .map(function(s){
@@ -769,27 +1041,22 @@ function viewProgress() {
       + '</div>';
   }).join('');
 
-  return '<div style="background:#F9FAFB;min-height:100vh;padding-bottom:80px;">'
-    + header
-    + '<div style="background:#F9FAFB;min-height:70vh;padding:8px 16px 0;max-width:480px;margin:0 auto;">'
-    + '<div class="card">'
-    + '<label style="display:block;font-size:11px;color:#6B7280;font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Exercise</label>'
-    + '<select onchange="appState.progressExercise=this.value;render();" style="width:100%;background:#F9FAFB;border:1px solid #E5E7EB;border-radius:10px;padding:10px 12px;font-size:13px;font-family:Inter,sans-serif;color:#0D1B2E;outline:none;">' + opts + '</select>'
-    + '</div>'
+  return '<div style="background:#F9FAFB;min-height:100vh;padding-bottom:80px;">' + header
+    + '<div style="padding:0 16px;max-width:480px;margin:0 auto;">'
+    + '<div class="card"><label style="display:block;font-size:11px;color:#6B7280;font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Exercise</label>'
+    + '<select onchange="appState.progressExercise=this.value;render();" style="width:100%;background:#F9FAFB;border:1px solid #E5E7EB;border-radius:10px;padding:10px 12px;font-size:13px;font-family:Inter,sans-serif;color:#0D1B2E;outline:none;">' + opts + '</select></div>'
     + (exData.length > 1
         ? '<div class="card"><canvas id="progress-chart"></canvas></div>'
-        : '<div class="card" style="text-align:center;color:#9CA3AF;font-size:13px;padding:32px;">Log 2+ sessions with this exercise to see a trend chart.</div>')
-    + '<div class="card">'
-    + '<h3 style="font-family:Oswald,sans-serif;font-size:12px;color:#059669;text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px;">Session Log</h3>'
-    + rows + '</div></div></div>';
+        : '<div class="card" style="text-align:center;color:#9CA3AF;font-size:13px;padding:32px;">Log 2+ sessions with this exercise to see a chart.</div>')
+    + '<div class="card"><h3 style="font-family:Oswald,sans-serif;font-size:12px;color:#059669;text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px;">Session Log</h3>' + rows + '</div>'
+    + '</div></div>';
 }
 
 function drawChart() {
   var canvas = document.getElementById('progress-chart');
   if (!canvas || !appState.progressExercise) return;
   var sel = appState.progressExercise;
-  var sessions = getSessions();
-  var exData = sessions
+  var exData = getSessions()
     .filter(function(s){ return s.exercises.some(function(e){ return e.name===sel; }); })
     .map(function(s){
       var ex = s.exercises.find(function(e){ return e.name===sel; });
@@ -803,35 +1070,20 @@ function drawChart() {
       datasets:[{
         label:'Best weight (kg)',
         data: exData.map(function(d){ return d.weight; }),
-        borderColor:'#059669',
-        backgroundColor:'rgba(5,150,105,0.08)',
-        borderWidth:2,
-        pointBackgroundColor:'#059669',
-        pointRadius:4,
-        tension:0.3,
-        fill:true,
+        borderColor:'#059669',backgroundColor:'rgba(5,150,105,0.08)',
+        borderWidth:2,pointBackgroundColor:'#059669',pointRadius:4,tension:0.3,fill:true,
       }]
     },
     options:{
       responsive:true,
       plugins:{legend:{display:false}},
       scales:{
-        y:{beginAtZero:false, ticks:{font:{size:11}}, grid:{color:'#F3F4F6'}},
-        x:{ticks:{font:{size:11}}, grid:{display:false}},
+        y:{beginAtZero:false,ticks:{font:{size:11}},grid:{color:'#F3F4F6'}},
+        x:{ticks:{font:{size:11}},grid:{display:false}},
       }
     }
   });
 }
-
-// ── INIT ──────────────────────────────────────────────────────
-if (isUnlocked() && PROGRAMS.length === 1) {
-  appState.program = PROGRAMS[0];
-  appState.view = 'workouts';
-}
-render();
 </script>
-<p style="text-align:center;padding:16px 0 24px;font-size:11px;color:rgba(0,0,0,.18);">
-  <a href="https://fitbodiesbymk-pixel.github.io/builtbymk/" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;">Built by BuiltByMK</a>
-</p>
 </body>
 </html>
