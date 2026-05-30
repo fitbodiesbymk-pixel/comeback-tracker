@@ -4,6 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Comeback Strong | Fitbodies by MK</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icon.svg" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Comeback Strong" />
+  <meta name="theme-color" content="#1C1C2E" />
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
@@ -719,7 +725,8 @@ function viewHome() {
       + [
           ['1', 'Sign in with Google', 'Tap the button above. This creates your account and saves your progress across all devices — no password needed.'],
           ['2', 'Enter your access code', 'You\'ll receive a code from MK when you join the program. Enter it once and you\'re unlocked permanently.'],
-          ['3', 'Start training', 'Go to the Programs tab, pick your workout, and log your sets. Your data saves automatically after every session.'],
+          ['3', 'Save to your home screen', 'On iPhone: tap the Share button in Safari → Add to Home Screen. On Android: tap the menu in Chrome → Add to Home Screen. Opens like a real app — no browser needed.'],
+          ['4', 'Start training', 'Go to the Programs tab, pick your workout, and log your sets. Your data saves automatically after every session.'],
         ].map(function(s) {
           return '<div style="display:flex;gap:16px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 20px;">'
             + '<div style="width:28px;height:28px;border-radius:999px;background:var(--accent);color:#fff;font-size:.82rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">' + s[0] + '</div>'
