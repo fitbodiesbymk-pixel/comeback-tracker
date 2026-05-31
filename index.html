@@ -505,6 +505,28 @@ function updateNav(v) {
 }
 
 // ── SIGN OUT ───────────────────────────────────────────────────
+var countdownInterval = null;
+
+function startCountdown() {
+  var deadline = new Date('2026-06-07T00:00:00+03:00').getTime();
+  function tick() {
+    var diff = deadline - Date.now();
+    if (diff <= 0) { clearInterval(countdownInterval); return; }
+    var d = Math.floor(diff / 86400000);
+    var h = Math.floor((diff % 86400000) / 3600000);
+    var m = Math.floor((diff % 3600000) / 60000);
+    var s = Math.floor((diff % 60000) / 1000);
+    var pad = function(n) { return String(n).padStart(2, '0'); };
+    var el = function(id) { return document.getElementById(id); };
+    if (el('cd-days'))  el('cd-days').textContent  = pad(d);
+    if (el('cd-hours')) el('cd-hours').textContent = pad(h);
+    if (el('cd-mins'))  el('cd-mins').textContent  = pad(m);
+    if (el('cd-secs'))  el('cd-secs').textContent  = pad(s);
+  }
+  tick();
+  countdownInterval = setInterval(tick, 1000);
+}
+
 function signOut() {
   if (fbAuth) {
     fbAuth.signOut().then(function() {
@@ -520,6 +542,7 @@ function signOut() {
 
 // ── RENDER ─────────────────────────────────────────────────────
 function render() {
+  if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
   var app = document.getElementById('app');
   var html = '';
   var v = appState.view;
@@ -539,6 +562,7 @@ function render() {
   void app.offsetWidth;
   attachListeners();
   if (v === 'progress') setTimeout(drawChart, 80);
+  if (document.getElementById('launch-countdown')) startCountdown();
 }
 
 function attachListeners() {
@@ -684,6 +708,12 @@ function viewHome() {
   } else if (!uid) {
     actionBlock = '<div style="margin-top:32px;">'
       + '<p style="font-size:.78rem;font-weight:700;color:#F59E0B;text-align:center;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;">⚡ Launch Price — Ends June 7</p>'
+      + '<div id="launch-countdown" style="display:flex;justify-content:center;gap:8px;margin:0 0 14px;">'
+      + '<div style="text-align:center;background:rgba(255,255,255,.08);border-radius:10px;padding:10px 14px;min-width:56px;"><div id="cd-days" style="font-size:1.5rem;font-weight:800;color:#fff;line-height:1;">00</div><div style="font-size:.6rem;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.08em;margin-top:4px;">Days</div></div>'
+      + '<div style="text-align:center;background:rgba(255,255,255,.08);border-radius:10px;padding:10px 14px;min-width:56px;"><div id="cd-hours" style="font-size:1.5rem;font-weight:800;color:#fff;line-height:1;">00</div><div style="font-size:.6rem;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.08em;margin-top:4px;">Hrs</div></div>'
+      + '<div style="text-align:center;background:rgba(255,255,255,.08);border-radius:10px;padding:10px 14px;min-width:56px;"><div id="cd-mins" style="font-size:1.5rem;font-weight:800;color:#fff;line-height:1;">00</div><div style="font-size:.6rem;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.08em;margin-top:4px;">Min</div></div>'
+      + '<div style="text-align:center;background:rgba(255,255,255,.08);border-radius:10px;padding:10px 14px;min-width:56px;"><div id="cd-secs" style="font-size:1.5rem;font-weight:800;color:#fff;line-height:1;">00</div><div style="font-size:.6rem;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.08em;margin-top:4px;">Sec</div></div>'
+      + '</div>'
       + '<a href="https://buy.stripe.com/eVqdR846T2f7amo0Aw53O04" target="_blank" class="cta-btn" style="display:block;width:100%;font-size:1.05rem;padding:18px;text-align:center;box-sizing:border-box;">Get Instant Access — $67</a>'
       + '<p style="font-size:.75rem;color:rgba(255,255,255,.4);text-align:center;margin-top:8px;margin-bottom:20px;">One-time payment · Lifetime access · 12 weeks · 8 workouts</p>'
       + '<div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">'
